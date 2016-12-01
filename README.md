@@ -6,7 +6,7 @@ It is still VERY early for this project, so please keep that in mind.  I am work
 Feedback is welcome even at this very early stage.
 
 Here is an example application using this library.
-```
+```go
 package main
 
 import (
