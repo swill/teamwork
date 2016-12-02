@@ -34,7 +34,7 @@ func main() {
 		fmt.Printf("Error getting Projects: %s", err.Error())
 	}
 
-	fmt.Println("1. Name: ", projects.All[0].Name)
-	fmt.Println("1. Status: ", projects.All[0].Status)
+	fmt.Println("1. Name: ", projects[0].Name)
+	fmt.Println("1. Status: ", projects[0].Status)
 }
 ```

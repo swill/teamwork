@@ -64,9 +64,7 @@ func Connect(ApiToken string) (*Connection, error) {
 	return connection, nil
 }
 
-type Projects struct {
-	All []Project `json:"projects"`
-}
+type Projects []Project
 
 type Project struct {
 	Announcement     string `json:"announcement"`
@@ -113,7 +111,7 @@ type Project struct {
 	} `json:"tags"`
 }
 
-func (conn *Connection) GetProjects() (*Projects, error) {
+func (conn *Connection) GetProjects() (Projects, error) {
 	method := "GET"
 	url := fmt.Sprintf("%sprojects.json", conn.Account.Url)
 	reader, err := Request(conn.ApiToken, method, url)
@@ -122,11 +120,13 @@ func (conn *Connection) GetProjects() (*Projects, error) {
 	}
 	defer reader.Close()
 
-	projects := &Projects{}
-	if err := json.NewDecoder(reader).Decode(projects); err != nil {
+	projects := make(Projects, 0)
+	err = json.NewDecoder(reader).Decode(&struct {
+		*Projects `json:"projects"`
+	}{&projects})
+	if err != nil {
 		return nil, err
 	}
-
 	//data, _ := ioutil.ReadAll(reader)
 	//log.Printf(string(data))
 
