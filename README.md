@@ -29,7 +29,10 @@ func main() {
 		os.Exit(1)
 	}
 
-	projects, err := conn.GetProjects()
+	params := &teamwork.ProjectsOps{
+		Status: "ALL",
+	}
+	projects, err := conn.GetProjects(params)
 	if err != nil {
 		fmt.Printf("Error getting Projects: %s", err.Error())
 	}

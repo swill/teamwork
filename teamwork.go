@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"reflect"
+	"strings"
 	"time"
 )
 
@@ -111,9 +113,23 @@ type Project struct {
 	} `json:"tags"`
 }
 
-func (conn *Connection) GetProjects() (Projects, error) {
+type ProjectsOps struct {
+	Status           string `param:"status"`
+	UpdatedAfterDate string `param:"updatedAfterDate"`
+	UpdatedAfterTime string `param:"updatedAfterTime"`
+	OrderBy          string `param:"orderby"`
+	CreatedAfterDate string `param:"createdAfterDate"`
+	CreatedAfterTime string `param:"createdAfterTime"`
+	CategoryID       string `param:"catId"`
+	IncludePeople    string `param:"includePeople"`
+	Page             string `param:"page"`
+}
+
+func (conn *Connection) GetProjects(ops *ProjectsOps) (Projects, error) {
+	params := BuildParams(ops)
+	fmt.Println("params", params)
 	method := "GET"
-	url := fmt.Sprintf("%sprojects.json", conn.Account.Url)
+	url := fmt.Sprintf("%sprojects.json%s", conn.Account.Url, params)
 	reader, err := Request(conn.ApiToken, method, url)
 	if err != nil {
 		return nil, err
@@ -152,4 +168,22 @@ func Request(token, method, url string) (io.ReadCloser, error) {
 	}
 
 	return resp.Body, nil
+}
+
+func BuildParams(ops interface{}) string {
+	pairs := make([]string, 0)
+	v := reflect.ValueOf(ops).Elem()
+	for i := 0; i < v.NumField(); i++ {
+		param_name := v.Type().Field(i).Tag.Get("param")
+		param_value := v.Field(i).Interface()
+		if param_name != "" && param_value.(string) != "" {
+			pair := fmt.Sprintf("%s=%s", param_name, param_value)
+			pairs = append(pairs, pair)
+		}
+	}
+	if len(pairs) > 0 {
+		return fmt.Sprintf("?%s", strings.Join(pairs, "&"))
+	} else {
+		return ""
+	}
 }
