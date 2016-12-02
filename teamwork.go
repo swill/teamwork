@@ -11,6 +11,9 @@ import (
 	"time"
 )
 
+// Connection is the established connection to TeamWork.
+// Once connected, it populates the details for the Account
+// which is making the calls to the API.
 type Connection struct {
 	Account struct {
 		AvatarUrl                  string `json:"avatar-url"`
@@ -48,10 +51,13 @@ type Connection struct {
 	ApiToken string
 }
 
+// Connect is the starting point to using the TeamWork API.
+// This function returns a Connection which is used to query
+// TeamWork via other functions.
 func Connect(ApiToken string) (*Connection, error) {
 	method := "GET"
 	url := "http://authenticate.teamworkpm.net/authenticate.json"
-	reader, err := Request(ApiToken, method, url)
+	reader, err := request(ApiToken, method, url)
 	if err != nil {
 		return nil, err
 	}
@@ -66,8 +72,10 @@ func Connect(ApiToken string) (*Connection, error) {
 	return connection, nil
 }
 
+// A list of Projects,
 type Projects []Project
 
+// The Project structure.
 type Project struct {
 	Announcement     string `json:"announcement"`
 	AnnouncementHTML string `json:"announcementHTML"`
@@ -113,24 +121,42 @@ type Project struct {
 	} `json:"tags"`
 }
 
+// ProjectsOps is used to generate the query params for the
+// GetProjects API call.
 type ProjectsOps struct {
-	Status           string `param:"status"`
-	UpdatedAfterDate string `param:"updatedAfterDate"`
-	UpdatedAfterTime string `param:"updatedAfterTime"`
-	OrderBy          string `param:"orderby"`
+	// Query projects based on these values.
+	//
+	// The category id to filter by.
+	CategoryID string `param:"catId"`
+	// The project was created after this date.  Eg: "20100603"
 	CreatedAfterDate string `param:"createdAfterDate"`
+	// The project was created after this time.  Eg: "15:21"
 	CreatedAfterTime string `param:"createdAfterTime"`
-	CategoryID       string `param:"catId"`
-	IncludePeople    string `param:"includePeople"`
-	Page             string `param:"page"`
+	// Output the people include in the project.  Eg: "true"
+	IncludePeople string `param:"includePeople"`
+	// Order the results by this value. Eg: "name", "companyName", etc...
+	OrderBy string `param:"orderby"`
+	// A page is 500 results.  Access additional pages.  Eg: "2", "5", etc...
+	Page string `param:"page"`
+	// The status of the project.
+	// Valid values are: ALL, ACTIVE, ARCHIVED, CURRENT, LATE, COMPLETED
+	Status string `param:"status"`
+	// The project was updated after this date.  Eg: "20100603"
+	UpdatedAfterDate string `param:"updatedAfterDate"`
+	// The project was updated after this time.  Eg: "15:21"
+	UpdatedAfterTime string `param:"updatedAfterTime"`
 }
 
+// GetProjects gets all the projects available according to the specified
+// ProjectsOps which are passed in.
+//
+// ref: http://developer.teamwork.com/projectsapi#retrieve_all_proj
 func (conn *Connection) GetProjects(ops *ProjectsOps) (Projects, error) {
-	params := BuildParams(ops)
+	params := build_params(ops)
 	fmt.Println("params", params)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects.json%s", conn.Account.Url, params)
-	reader, err := Request(conn.ApiToken, method, url)
+	reader, err := request(conn.ApiToken, method, url)
 	if err != nil {
 		return nil, err
 	}
@@ -149,7 +175,8 @@ func (conn *Connection) GetProjects(ops *ProjectsOps) (Projects, error) {
 	return projects, nil
 }
 
-func Request(token, method, url string) (io.ReadCloser, error) {
+// request is the base level function for calling the TeamWork API.
+func request(token, method, url string) (io.ReadCloser, error) {
 	client := &http.Client{}
 
 	req, err := http.NewRequest(method, url, nil)
@@ -170,7 +197,12 @@ func Request(token, method, url string) (io.ReadCloser, error) {
 	return resp.Body, nil
 }
 
-func BuildParams(ops interface{}) string {
+// build_params takes and struct and build query params based
+// on the `param:"param_name"` struct field tags.
+//
+// ref: https://play.golang.org/p/P9zvVJnMhR
+// ref: https://gist.github.com/drewolson/4771479
+func build_params(ops interface{}) string {
 	pairs := make([]string, 0)
 	v := reflect.ValueOf(ops).Elem()
 	for i := 0; i < v.NumField(); i++ {
