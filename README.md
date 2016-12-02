@@ -1,5 +1,6 @@
 TeamWork
 ========
+[![GoDoc](https://godoc.org/github.com/swill/teamwork?status.svg)](https://godoc.org/github.com/swill/teamwork)
 
 It is still VERY early for this project, so please keep that in mind.  I am working out how I want to manage all of the parameters and configuration options in a generalized way and then I will start adding more components.
 
