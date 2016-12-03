@@ -72,11 +72,22 @@ func Connect(ApiToken string) (*Connection, error) {
 	return connection, nil
 }
 
-// A list of Projects,
+// A list of Projects.
 type Projects []Project
 
 // The Project structure.
 type Project struct {
+	ActivePages struct {
+		Billing      string `json:"billing"`
+		Files        string `json:"files"`
+		Links        string `json:"links"`
+		Messages     string `json:"messages"`
+		Milestones   string `json:"milestones"`
+		Notebooks    string `json:"notebooks"`
+		RiskRegister string `json:"riskRegister"`
+		Tasks        string `json:"tasks"`
+		Time         string `json:"time"`
+	} `json:"active-pages"`
 	Announcement     string `json:"announcement"`
 	AnnouncementHTML string `json:"announcementHTML"`
 	Category         struct {
@@ -104,7 +115,7 @@ type Project struct {
 	Logo                 string    `json:"logo"`
 	LogoFromCompany      bool      `json:"logoFromCompany,omitempty"`
 	Name                 string    `json:"name"`
-	Notifyeveryone       bool      `json:"notifyeveryone"`
+	NotifyEveryone       bool      `json:"notifyeveryone"`
 	People               []string  `json:"people"`
 	PrivacyEnabled       bool      `json:"privacyEnabled"`
 	ReplyByEmailEnabled  bool      `json:"replyByEmailEnabled"`
@@ -152,27 +163,60 @@ type ProjectsOps struct {
 //
 // ref: http://developer.teamwork.com/projectsapi#retrieve_all_proj
 func (conn *Connection) GetProjects(ops *ProjectsOps) (Projects, error) {
+	projects := make(Projects, 0)
 	params := build_params(ops)
-	fmt.Println("params", params)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects.json%s", conn.Account.Url, params)
 	reader, err := request(conn.ApiToken, method, url)
 	if err != nil {
-		return nil, err
+		return projects, err
 	}
 	defer reader.Close()
 
-	projects := make(Projects, 0)
 	err = json.NewDecoder(reader).Decode(&struct {
 		*Projects `json:"projects"`
 	}{&projects})
 	if err != nil {
-		return nil, err
+		return projects, err
 	}
+
+	return projects, nil
+}
+
+// ProjectOps is used to generate the query params for the
+// GetProject API call.
+type ProjectOps struct {
+	// Query a project based on these values.
+	//
+	// Output the people include in the project.  Eg: "true"
+	IncludePeople string `param:"includePeople"`
+}
+
+// GetProject gets a single project based on a project ID.
+//
+// ref: http://developer.teamwork.com/projectsapi#retrieve_a_single
+func (conn *Connection) GetProject(id string, ops *ProjectOps) (Project, error) {
+	project := &Project{}
+	params := build_params(ops)
+	method := "GET"
+	url := fmt.Sprintf("%sprojects/%s.json%s", conn.Account.Url, id, params)
+	reader, err := request(conn.ApiToken, method, url)
+	if err != nil {
+		return *project, err
+	}
+	defer reader.Close()
+
+	err = json.NewDecoder(reader).Decode(&struct {
+		*Project `json:"project"`
+	}{project})
+	if err != nil {
+		return *project, err
+	}
+
 	//data, _ := ioutil.ReadAll(reader)
 	//log.Printf(string(data))
 
-	return projects, nil
+	return *project, nil
 }
 
 // request is the base level function for calling the TeamWork API.

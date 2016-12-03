@@ -30,15 +30,24 @@ func main() {
 		os.Exit(1)
 	}
 
-	params := &teamwork.ProjectsOps{
+	projects_ops := &teamwork.ProjectsOps{
 		Status: "ALL",
 	}
-	projects, err := conn.GetProjects(params)
+	projects, err := conn.GetProjects(projects_ops)
 	if err != nil {
 		fmt.Printf("Error getting Projects: %s", err.Error())
 	}
 
 	fmt.Println("1. Name: ", projects[0].Name)
 	fmt.Println("1. Status: ", projects[0].Status)
+
+	project_ops := &teamwork.ProjectOps{}
+	project, err := conn.GetProject("158747", project_ops)
+	if err != nil {
+		fmt.Printf("Error getting Projects: %s", err.Error())
+	}
+
+	fmt.Println("Name: ", project.Name)
+	fmt.Println("Status: ", project.Status)
 }
 ```
