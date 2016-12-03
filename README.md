@@ -30,6 +30,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	// get all projects
 	projects_ops := &teamwork.ProjectsOps{
 		Status: "ALL",
 	}
@@ -41,6 +42,7 @@ func main() {
 	fmt.Println("1. Name: ", projects[0].Name)
 	fmt.Println("1. Status: ", projects[0].Status)
 
+	// get one project
 	project_ops := &teamwork.ProjectOps{}
 	project, err := conn.GetProject("158747", project_ops)
 	if err != nil {
