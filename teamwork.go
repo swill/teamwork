@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"reflect"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -57,7 +58,7 @@ type Connection struct {
 func Connect(ApiToken string) (*Connection, error) {
 	method := "GET"
 	url := "http://authenticate.teamworkpm.net/authenticate.json"
-	reader, err := request(ApiToken, method, url)
+	reader, _, err := request(ApiToken, method, url)
 	if err != nil {
 		return nil, err
 	}
@@ -70,6 +71,20 @@ func Connect(ApiToken string) (*Connection, error) {
 		return nil, err
 	}
 	return connection, nil
+}
+
+// The X-Page(s) headers that are returned with queries.
+// The struct is populated by the headers when returning
+// lists of data from TeamWork.  Use thic concept to
+// set a struct from the response headers of the API.
+// You only have to specify the `header:"Header-Name"`
+// and then use `get_headers(headers, &struct)` to
+// populate.
+// Currently supports: Int and String
+type Pages struct {
+	Page    int `header:"X-Page"`
+	Pages   int `header:"X-Pages"`
+	Records int `header:"X-Records"`
 }
 
 // A list of Projects.
@@ -162,25 +177,27 @@ type ProjectsOps struct {
 // ProjectsOps which are passed in.
 //
 // ref: http://developer.teamwork.com/projectsapi#retrieve_all_proj
-func (conn *Connection) GetProjects(ops *ProjectsOps) (Projects, error) {
+func (conn *Connection) GetProjects(ops *ProjectsOps) (Projects, Pages, error) {
 	projects := make(Projects, 0)
+	pages := &Pages{}
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects.json%s", conn.Account.Url, params)
-	reader, err := request(conn.ApiToken, method, url)
+	reader, headers, err := request(conn.ApiToken, method, url)
 	if err != nil {
-		return projects, err
+		return projects, *pages, err
 	}
+	get_headers(headers, pages)
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
 		*Projects `json:"projects"`
 	}{&projects})
 	if err != nil {
-		return projects, err
+		return projects, *pages, err
 	}
 
-	return projects, nil
+	return projects, *pages, nil
 }
 
 // ProjectOps is used to generate the query params for the
@@ -200,7 +217,7 @@ func (conn *Connection) GetProject(id string, ops *ProjectOps) (Project, error) 
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects/%s.json%s", conn.Account.Url, id, params)
-	reader, err := request(conn.ApiToken, method, url)
+	reader, _, err := request(conn.ApiToken, method, url)
 	if err != nil {
 		return *project, err
 	}
@@ -220,13 +237,12 @@ func (conn *Connection) GetProject(id string, ops *ProjectOps) (Project, error) 
 }
 
 // request is the base level function for calling the TeamWork API.
-func request(token, method, url string) (io.ReadCloser, error) {
+func request(token, method, url string) (io.ReadCloser, http.Header, error) {
 	client := &http.Client{}
-
-	req, err := http.NewRequest(method, url, nil)
+	req, err := http.NewRequest(method, url, nil) // TODO: Add payload to support POST
 	if err != nil {
 		log.Printf("NewRequest: ", err)
-		return nil, err
+		return nil, nil, err
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
@@ -235,13 +251,13 @@ func request(token, method, url string) (io.ReadCloser, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("Do: ", err)
-		return nil, err
+		return nil, nil, err
 	}
 
-	return resp.Body, nil
+	return resp.Body, resp.Header, nil
 }
 
-// build_params takes and struct and build query params based
+// build_params takes a struct and builds query params based
 // on the `param:"param_name"` struct field tags.
 //
 // ref: https://play.golang.org/p/P9zvVJnMhR
@@ -250,16 +266,53 @@ func build_params(ops interface{}) string {
 	pairs := make([]string, 0)
 	v := reflect.ValueOf(ops).Elem()
 	for i := 0; i < v.NumField(); i++ {
-		param_name := v.Type().Field(i).Tag.Get("param")
-		param_value := v.Field(i).Interface()
-		if param_name != "" && param_value.(string) != "" {
+		param_name := v.Type().Field(i).Tag.Get("param")    // get value from struct field tag
+		param_value := v.Field(i).Interface()               // value of the field
+		if param_name != "" && param_value.(string) != "" { // make sure we have what we need to set a param
 			pair := fmt.Sprintf("%s=%s", param_name, param_value)
-			pairs = append(pairs, pair)
+			pairs = append(pairs, pair) // add to the param pairs array
 		}
 	}
 	if len(pairs) > 0 {
-		return fmt.Sprintf("?%s", strings.Join(pairs, "&"))
+		return fmt.Sprintf("?%s", strings.Join(pairs, "&")) // return the params with the leading '?'
 	} else {
-		return ""
+		return "" // nothing to send back
+	}
+}
+
+// get_headers takes the response headers and populates
+// a struct of data according to the `header:"HeaderName"`.
+// Function currently only supports Int and String field types.
+//
+// ref: https://play.golang.org/p/P9zvVJnMhR
+// ref: https://gist.github.com/drewolson/4771479\
+// ref: http://stackoverflow.com/a/6396678/977216
+func get_headers(headers http.Header, obj interface{}) {
+	v := reflect.ValueOf(obj).Elem()
+	if v.Kind() == reflect.Struct { // make sure we have a struct
+		for i := 0; i < v.NumField(); i++ { // for all fields
+			field := v.Field(i)                    // value field.
+			if field.IsValid() && field.CanSet() { // is exported and addressable
+				header_name := v.Type().Field(i).Tag.Get("header") // get value from struct field tag
+				if header_name != "" {                             // make sure the header is set
+					header_val := headers.Get(header_name)
+					if header_val != "" { // make sure we have a value in the header
+						switch {
+						case field.Kind() == reflect.Int: // Int struct field type
+							h_val, err := strconv.ParseInt(header_val, 10, 64)
+							if err != nil {
+								log.Printf("Failed to convert header '%s' to a 64 bit Int. \n%s", header_name, err.Error())
+								continue
+							}
+							if !field.OverflowInt(h_val) {
+								field.SetInt(h_val)
+							}
+						case field.Kind() == reflect.String: // String struct field type
+							field.SetString(header_val)
+						}
+					}
+				}
+			}
+		}
 	}
 }
