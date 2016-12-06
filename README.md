@@ -31,7 +31,7 @@ func main() {
 	}
 
 	// get all projects
-	projects_ops := &teamwork.ProjectsOps{
+	projects_ops := &teamwork.GetProjectsOps{
 		Status: "ALL",
 	}
 	projects, pages, err := conn.GetProjects(projects_ops)
@@ -46,7 +46,7 @@ func main() {
 	fmt.Println("# of records: ", pages.Records)
 
 	// get one project
-	project_ops := &teamwork.ProjectOps{}
+	project_ops := &teamwork.GetProjectOps{}
 	project, err := conn.GetProject("158747", project_ops)
 	if err != nil {
 		fmt.Printf("Error getting Projects: %s", err.Error())

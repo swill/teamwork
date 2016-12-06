@@ -8,7 +8,7 @@ import (
 
 func ExampleConnection_GetProjects() {
 	// get all projects
-	projects_ops := &teamwork.ProjectsOps{
+	projects_ops := &teamwork.GetProjectsOps{
 		Status: "ALL",
 	}
 	projects, pages, err := conn.GetProjects(projects_ops)
@@ -25,7 +25,7 @@ func ExampleConnection_GetProjects() {
 
 func ExampleConnection_GetProject() {
 	// get one project
-	project_ops := &teamwork.ProjectOps{}
+	project_ops := &teamwork.GetProjectOps{}
 	project, err := conn.GetProject("#####", project_ops)
 	if err != nil {
 		fmt.Printf("Error getting Projects: %s", err.Error())

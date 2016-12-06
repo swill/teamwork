@@ -80,9 +80,9 @@ type Project struct {
 	} `json:"tags"`
 }
 
-// ProjectsOps is used to generate the query params for the
+// GetProjectsOps is used to generate the query params for the
 // GetProjects API call.
-type ProjectsOps struct {
+type GetProjectsOps struct {
 	// Query projects based on these values.
 	//
 	// The category id to filter by.
@@ -107,10 +107,10 @@ type ProjectsOps struct {
 }
 
 // GetProjects gets all the projects available according to the specified
-// ProjectsOps which are passed in.
+// GetProjectsOps which are passed in.
 //
 // ref: http://developer.teamwork.com/projectsapi#retrieve_all_proj
-func (conn *Connection) GetProjects(ops *ProjectsOps) (Projects, Pages, error) {
+func (conn *Connection) GetProjects(ops *GetProjectsOps) (Projects, Pages, error) {
 	projects := make(Projects, 0)
 	pages := &Pages{}
 	params := build_params(ops)
@@ -133,9 +133,9 @@ func (conn *Connection) GetProjects(ops *ProjectsOps) (Projects, Pages, error) {
 	return projects, *pages, nil
 }
 
-// ProjectOps is used to generate the query params for the
+// GetProjectOps is used to generate the query params for the
 // GetProject API call.
-type ProjectOps struct {
+type GetProjectOps struct {
 	// Query a project based on these values.
 	//
 	// Output the people include in the project.  Eg: "true"
@@ -145,7 +145,7 @@ type ProjectOps struct {
 // GetProject gets a single project based on a project ID.
 //
 // ref: http://developer.teamwork.com/projectsapi#retrieve_a_single
-func (conn *Connection) GetProject(id string, ops *ProjectOps) (Project, error) {
+func (conn *Connection) GetProject(id string, ops *GetProjectOps) (Project, error) {
 	project := &Project{}
 	params := build_params(ops)
 	method := "GET"
