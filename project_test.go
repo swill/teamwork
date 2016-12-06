@@ -6,7 +6,7 @@ import (
 	"github.com/swill/teamwork"
 )
 
-func ExampleGetProjects() {
+func ExampleConnection_GetProjects() {
 	// get all projects
 	projects_ops := &teamwork.ProjectsOps{
 		Status: "ALL",
@@ -23,7 +23,7 @@ func ExampleGetProjects() {
 	fmt.Println("# of records: ", pages.Records)
 }
 
-func ExampleGetProject() {
+func ExampleConnection_GetProject() {
 	// get one project
 	project_ops := &teamwork.ProjectOps{}
 	project, err := conn.GetProject("#####", project_ops)
