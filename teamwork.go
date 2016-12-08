@@ -110,7 +110,17 @@ func build_params(ops interface{}) string {
 		case v.Field(i).Kind() == reflect.Bool:
 			param_value = strconv.FormatBool(v.Field(i).Interface().(bool))
 		case v.Field(i).Kind() == reflect.Int:
+			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int)), 10)
+		case v.Field(i).Kind() == reflect.Int8:
+			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int8)), 10)
+		case v.Field(i).Kind() == reflect.Int16:
+			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int16)), 10)
+		case v.Field(i).Kind() == reflect.Int32:
+			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int32)), 10)
+		case v.Field(i).Kind() == reflect.Int64:
 			param_value = strconv.FormatInt(v.Field(i).Interface().(int64), 10)
+		case v.Field(i).Kind() == reflect.Float32:
+			param_value = strconv.FormatFloat(float64(v.Field(i).Interface().(float32)), 'f', -1, 64)
 		case v.Field(i).Kind() == reflect.Float64:
 			param_value = strconv.FormatFloat(v.Field(i).Interface().(float64), 'f', -1, 64)
 		}
