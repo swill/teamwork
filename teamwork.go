@@ -102,9 +102,19 @@ func build_params(ops interface{}) string {
 	pairs := make([]string, 0)
 	v := reflect.ValueOf(ops).Elem()
 	for i := 0; i < v.NumField(); i++ {
-		param_name := v.Type().Field(i).Tag.Get("param")    // get value from struct field tag
-		param_value := v.Field(i).Interface()               // value of the field
-		if param_name != "" && param_value.(string) != "" { // make sure we have what we need to set a param
+		var param_value string
+		param_name := v.Type().Field(i).Tag.Get("param") // get value from struct field tag
+		switch {                                         // value of the field
+		case v.Field(i).Kind() == reflect.String:
+			param_value = v.Field(i).Interface().(string)
+		case v.Field(i).Kind() == reflect.Bool:
+			param_value = strconv.FormatBool(v.Field(i).Interface().(bool))
+		case v.Field(i).Kind() == reflect.Int:
+			param_value = strconv.FormatInt(v.Field(i).Interface().(int64), 10)
+		case v.Field(i).Kind() == reflect.Float64:
+			param_value = strconv.FormatFloat(v.Field(i).Interface().(float64), 'f', -1, 64)
+		}
+		if param_name != "" && param_value != "" { // make sure we have what we need to set a param
 			pair := fmt.Sprintf("%s=%s", param_name, param_value)
 			pairs = append(pairs, pair) // add to the param pairs array
 		}

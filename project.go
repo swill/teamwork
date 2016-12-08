@@ -6,20 +6,6 @@ import (
 	"time"
 )
 
-// The X-Page(s) headers that are returned with queries.
-// The struct is populated by the headers when returning
-// lists of data from TeamWork.  Use thic concept to
-// set a struct from the response headers of the API.
-// You only have to specify the `header:"Header-Name"`
-// and then use `get_headers(headers, &struct)` to
-// populate.
-// Currently supports: Int and String
-type Pages struct {
-	Page    int `header:"X-Page"`
-	Pages   int `header:"X-Pages"`
-	Records int `header:"X-Records"`
-}
-
 // A list of Projects.
 type Projects []Project
 
@@ -91,12 +77,12 @@ type GetProjectsOps struct {
 	CreatedAfterDate string `param:"createdAfterDate"`
 	// The project was created after this time.  Eg: "15:21"
 	CreatedAfterTime string `param:"createdAfterTime"`
-	// Output the people include in the project.  Eg: "true"
-	IncludePeople string `param:"includePeople"`
+	// Output the people include in the project.  Eg: true
+	IncludePeople bool `param:"includePeople"`
 	// Order the results by this value. Eg: "name", "companyName", etc...
 	OrderBy string `param:"orderby"`
-	// A page is 500 results.  Access additional pages.  Eg: "2", "5", etc...
-	Page string `param:"page"`
+	// A page is 500 results.  Access additional pages.  Eg: 2, etc...
+	Page int `param:"page"`
 	// The status of the project.
 	// Valid values are: ALL, ACTIVE, ARCHIVED, CURRENT, LATE, COMPLETED
 	Status string `param:"status"`
@@ -162,9 +148,6 @@ func (conn *Connection) GetProject(id string, ops *GetProjectOps) (Project, erro
 	if err != nil {
 		return *project, err
 	}
-
-	//data, _ := ioutil.ReadAll(reader)
-	//log.Printf(string(data))
 
 	return *project, nil
 }
