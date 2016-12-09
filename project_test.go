@@ -25,12 +25,14 @@ func ExampleConnection_GetProjects() {
 
 func ExampleConnection_GetProject() {
 	// get one project
-	project_ops := &teamwork.GetProjectOps{}
-	project, err := conn.GetProject("#####", project_ops)
+	project_ops := &teamwork.GetProjectOps{
+		IncludePeople: true,
+	}
+	project, err := conn.GetProject("158747", project_ops)
 	if err != nil {
 		fmt.Printf("Error getting Projects: %s", err.Error())
 	}
 
-	fmt.Println("Name: ", project.Name)
-	fmt.Println("Status: ", project.Status)
+	fmt.Println("\nName:", project.Name)
+	fmt.Println("Status:", project.Status)
 }

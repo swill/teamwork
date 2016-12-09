@@ -73,22 +73,22 @@ type GetProjectsOps struct {
 	//
 	// The category id to filter by.
 	CategoryID string `param:"catId"`
-	// The project was created after this date.  Eg: "20100603"
+	// The project was created after this date.  (eg: "20100603")
 	CreatedAfterDate string `param:"createdAfterDate"`
-	// The project was created after this time.  Eg: "15:21"
+	// The project was created after this time.  (eg: "15:21")
 	CreatedAfterTime string `param:"createdAfterTime"`
-	// Output the people include in the project.  Eg: true
+	// Output the people include in the project.  (eg: true)
 	IncludePeople bool `param:"includePeople"`
-	// Order the results by this value. Eg: "name", "companyName", etc...
+	// Order the results by this value. (eg: "name", "companyName", etc...)
 	OrderBy string `param:"orderby"`
-	// A page is 500 results.  Access additional pages.  Eg: 2, etc...
+	// A page is 500 results.  Access additional pages.  (eg: 2, etc...)
 	Page int `param:"page"`
 	// The status of the project.
-	// Valid values are: ALL, ACTIVE, ARCHIVED, CURRENT, LATE, COMPLETED
+	// Valid values are: (eg: "ALL", "ACTIVE", "ARCHIVED", "CURRENT", "LATE", "COMPLETED")
 	Status string `param:"status"`
-	// The project was updated after this date.  Eg: "20100603"
+	// The project was updated after this date.  (eg: "20100603")
 	UpdatedAfterDate string `param:"updatedAfterDate"`
-	// The project was updated after this time.  Eg: "15:21"
+	// The project was updated after this time.  (eg: "15:21")
 	UpdatedAfterTime string `param:"updatedAfterTime"`
 }
 
@@ -124,8 +124,8 @@ func (conn *Connection) GetProjects(ops *GetProjectsOps) (Projects, Pages, error
 type GetProjectOps struct {
 	// Query a project based on these values.
 	//
-	// Output the people include in the project.  Eg: "true"
-	IncludePeople string `param:"includePeople"`
+	// Output the people include in the project (eg: true or false).
+	IncludePeople bool `param:"includePeople"`
 }
 
 // GetProject gets a single project based on a project ID.

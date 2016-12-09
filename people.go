@@ -43,7 +43,8 @@ type Person struct {
 	ID                      string    `json:"id"`
 	ImHandle                string    `json:"im-handle"`
 	ImService               string    `json:"im-service"`
-	//InOwnerCompany          bool      `json:"in-owner-company"` bool in People and string in Person :(
+	// bool in People and string in Person :(
+	//InOwnerCompany          bool      `json:"in-owner-company"`
 	IsClockedIn   bool      `json:"isClockedIn"` // Person only
 	LastActive    string    `json:"last-active"`
 	LastChangedOn time.Time `json:"last-changed-on"`
@@ -103,9 +104,13 @@ type Person struct {
 // GetPeople API call.
 type GetPeopleOps struct {
 	// Query people based on these values.
-	EmailAddress     string `param:"emailaddress"`
-	FullProfile      bool   `param:"fullprofile"`
-	ReturnProjectIds bool   `param:"returnProjectIds"`
+	//
+	// Pass this parameter to check if a user exists by email address.
+	EmailAddress string `param:"emailaddress"`
+	// Pass this parameter to return private notes for users.
+	FullProfile bool `param:"fullprofile"`
+	// Pass this parameter to return the ProjectIds the user is a member of.
+	ReturnProjectIds bool `param:"returnProjectIds"`
 }
 
 // GetPeople gets all the people available according to the specified
