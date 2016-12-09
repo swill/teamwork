@@ -123,7 +123,6 @@ func (conn *Connection) GetPeople(ops *GetPeopleOps) (People, Pages, error) {
 		return people, *pages, err
 	}
 	get_headers(headers, pages)
-
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
@@ -147,8 +146,6 @@ func (conn *Connection) GetPerson(id string) (Person, error) {
 	if err != nil {
 		return *person, err
 	}
-	//data, _ := ioutil.ReadAll(reader)
-	//bool.Printf(string(data))
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
