@@ -8,9 +8,10 @@ import (
 
 func ExampleConnection_GetPeople() {
 	// get all people
+	True := true
 	people_ops := &teamwork.GetPeopleOps{
-		FullProfile:      true,
-		ReturnProjectIds: true,
+		FullProfile:      &True,
+		ReturnProjectIds: &True,
 	}
 	people, pages, err := conn.GetPeople(people_ops)
 	if err != nil {

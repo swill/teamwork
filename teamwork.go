@@ -104,25 +104,56 @@ func build_params(ops interface{}) string {
 	for i := 0; i < v.NumField(); i++ {
 		var param_value string
 		param_name := v.Type().Field(i).Tag.Get("param") // get value from struct field tag
-		switch {                                         // value of the field
+
+		is_pointer := false
+		var kind reflect.Kind
+		// Handle either strings or pointers
+		switch {
+		case v.Field(i).Kind() == reflect.Ptr:
+			kind = v.Field(i).Elem().Kind()
+			is_pointer = true
 		case v.Field(i).Kind() == reflect.String:
 			param_value = v.Field(i).Interface().(string)
-		case v.Field(i).Kind() == reflect.Bool:
-			param_value = strconv.FormatBool(v.Field(i).Interface().(bool))
-		case v.Field(i).Kind() == reflect.Int:
-			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int)), 10)
-		case v.Field(i).Kind() == reflect.Int8:
-			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int8)), 10)
-		case v.Field(i).Kind() == reflect.Int16:
-			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int16)), 10)
-		case v.Field(i).Kind() == reflect.Int32:
-			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int32)), 10)
-		case v.Field(i).Kind() == reflect.Int64:
-			param_value = strconv.FormatInt(v.Field(i).Interface().(int64), 10)
-		case v.Field(i).Kind() == reflect.Float32:
-			param_value = strconv.FormatFloat(float64(v.Field(i).Interface().(float32)), 'f', -1, 64)
-		case v.Field(i).Kind() == reflect.Float64:
-			param_value = strconv.FormatFloat(v.Field(i).Interface().(float64), 'f', -1, 64)
+		}
+
+		// handle pointers
+		switch {
+		case is_pointer && kind == reflect.String:
+			if v.Field(i).Interface() != nil {
+				param_value = *v.Field(i).Interface().(*string)
+			}
+		case is_pointer && kind == reflect.Bool:
+			if v.Field(i).Interface() != nil {
+				param_value = strconv.FormatBool(*v.Field(i).Interface().(*bool))
+			}
+		case is_pointer && kind == reflect.Int:
+			if v.Field(i).Interface() != nil {
+				param_value = strconv.FormatInt(int64(*v.Field(i).Interface().(*int)), 10)
+			}
+		case is_pointer && kind == reflect.Int8:
+			if v.Field(i).Interface() != nil {
+				param_value = strconv.FormatInt(int64(*v.Field(i).Interface().(*int8)), 10)
+			}
+		case is_pointer && kind == reflect.Int16:
+			if v.Field(i).Interface() != nil {
+				param_value = strconv.FormatInt(int64(*v.Field(i).Interface().(*int16)), 10)
+			}
+		case is_pointer && kind == reflect.Int32:
+			if v.Field(i).Interface() != nil {
+				param_value = strconv.FormatInt(int64(*v.Field(i).Interface().(*int32)), 10)
+			}
+		case is_pointer && kind == reflect.Int64:
+			if v.Field(i).Interface() != nil {
+				param_value = strconv.FormatInt(*v.Field(i).Interface().(*int64), 10)
+			}
+		case is_pointer && kind == reflect.Float32:
+			if v.Field(i).Interface() != nil {
+				param_value = strconv.FormatFloat(float64(*v.Field(i).Interface().(*float32)), 'f', -1, 64)
+			}
+		case is_pointer && kind == reflect.Float64:
+			if v.Field(i).Interface() != nil {
+				param_value = strconv.FormatFloat(*v.Field(i).Interface().(*float64), 'f', -1, 64)
+			}
 		}
 		if param_name != "" && param_value != "" { // make sure we have what we need to set a param
 			pair := fmt.Sprintf("%s=%s", param_name, param_value)
@@ -141,7 +172,7 @@ func build_params(ops interface{}) string {
 // Function currently only supports Int and String field types.
 //
 // ref: https://play.golang.org/p/P9zvVJnMhR
-// ref: https://gist.github.com/drewolson/4771479\
+// ref: https://gist.github.com/drewolson/4771479
 // ref: http://stackoverflow.com/a/6396678/977216
 func get_headers(headers http.Header, obj interface{}) {
 	v := reflect.ValueOf(obj).Elem()

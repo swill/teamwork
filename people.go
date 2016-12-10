@@ -108,9 +108,11 @@ type GetPeopleOps struct {
 	// Pass this parameter to check if a user exists by email address.
 	EmailAddress string `param:"emailaddress"`
 	// Pass this parameter to return private notes for users.
-	FullProfile bool `param:"fullprofile"`
+	// Valid Input: true, false
+	FullProfile *bool `param:"fullprofile"`
 	// Pass this parameter to return the ProjectIds the user is a member of.
-	ReturnProjectIds bool `param:"returnProjectIds"`
+	// Valid Input: true, false
+	ReturnProjectIds *bool `param:"returnProjectIds"`
 }
 
 // GetPeople gets all the people available according to the specified

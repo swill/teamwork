@@ -25,8 +25,9 @@ func ExampleConnection_GetProjects() {
 
 func ExampleConnection_GetProject() {
 	// get one project
+	True := true
 	project_ops := &teamwork.GetProjectOps{
-		IncludePeople: true,
+		IncludePeople: &True,
 	}
 	project, err := conn.GetProject("158747", project_ops)
 	if err != nil {
