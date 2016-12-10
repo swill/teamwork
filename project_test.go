@@ -35,7 +35,6 @@ func ExampleConnection_GetProject() {
 		fmt.Printf("Error getting Projects: %s", err.Error())
 	}
 
-	fmt.Println("ID:", project.ID)
 	fmt.Println("Name:", project.Name)
 	fmt.Println("Status:", project.Status)
 }
