@@ -22,7 +22,7 @@ func ExampleConnection_GetTasks() {
 		fmt.Printf("Error getting Tasks: %s", err.Error())
 	}
 
-	fmt.Println("\n1. Task List Name:", tasks[0].TodoListName)
+	fmt.Println("1. Task List Name:", tasks[0].TodoListName)
 	fmt.Println("1. Task ID:", tasks[0].ID)
 	fmt.Println("1. Task Content:", tasks[0].Content)
 	fmt.Println("1. Task Status:", tasks[0].Status)
