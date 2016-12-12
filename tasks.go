@@ -74,17 +74,17 @@ type Task struct {
 	StartDate                 string        `json:"start-date"`
 	Status                    string        `json:"status"`
 	SubTasks                  []Task        `json:"subTasks,omitempty"`
-	TasklistIsTemplate        bool          `json:"tasklist-isTemplate"`
-	TasklistLockdownID        string        `json:"tasklist-lockdownId"`
-	TasklistPrivate           bool          `json:"tasklist-private"`
+	TaskListID                int           `json:"todo-list-id"`
+	TaskListIsTemplate        bool          `json:"tasklist-isTemplate"`
+	TaskListLockdownID        string        `json:"tasklist-lockdownId"`
+	TaskListName              string        `json:"todo-list-name"`
+	TaskListPrivate           bool          `json:"tasklist-private"`
 	Tags                      []struct {
 		Color string `json:"color"`
 		ID    int    `json:"id"`
 		Name  string `json:"name"`
 	} `json:"tags,omitempty"`
 	TimeIsLogged          string `json:"timeIsLogged"`
-	TodoListID            int    `json:"todo-list-id"`
-	TodoListName          string `json:"todo-list-name"`
 	UserFollowingChanges  bool   `json:"userFollowingChanges"`
 	UserFollowingComments bool   `json:"userFollowingComments"`
 	ViewEstimatedTime     bool   `json:"viewEstimatedTime"`
@@ -177,7 +177,7 @@ type GetTasksOps struct {
 	UpdatedAfterDate string `param:"updatedAfterDate"`
 }
 
-// GetTasks gets all the time entries available according to the specified
+// GetTasks gets all the tasks available according to the specified
 // GetTasksOps which are passed in.
 //
 // ref: http://developer.teamwork.com/timetracking#retrieve_all_time
@@ -204,4 +204,137 @@ func (conn *Connection) GetTasks(ops *GetTasksOps) (Tasks, Pages, error) {
 	}
 
 	return tasks, *pages, nil
+}
+
+// GetProjectTasks gets all the project tasks available according to the specified
+// GetTasksOps which are passed in.
+//
+// ref: http://developer.teamwork.com/timetracking#retrieve_all_time
+func (conn *Connection) GetProjectTasks(id string, ops *GetTasksOps) (Tasks, Pages, error) {
+	tasks := make(Tasks, 0)
+	pages := &Pages{}
+	params := build_params(ops)
+	method := "GET"
+	url := fmt.Sprintf("%sprojects/%s/tasks.json%s", conn.Account.Url, id, params)
+	reader, headers, err := request(conn.ApiToken, method, url)
+	if err != nil {
+		return tasks, *pages, err
+	}
+	//data, _ := ioutil.ReadAll(reader)
+	//fmt.Printf(string(data))
+	get_headers(headers, pages)
+	defer reader.Close()
+
+	err = json.NewDecoder(reader).Decode(&struct {
+		*Tasks `json:"todo-items"`
+	}{&tasks})
+	if err != nil {
+		return tasks, *pages, err
+	}
+
+	return tasks, *pages, nil
+}
+
+// GetTaskListTasks gets all the task list tasks available according to the specified
+// GetTasksOps which are passed in.
+//
+// ref: http://developer.teamwork.com/timetracking#retrieve_all_time
+func (conn *Connection) GetTaskListTasks(id string, ops *GetTasksOps) (Tasks, Pages, error) {
+	tasks := make(Tasks, 0)
+	pages := &Pages{}
+	params := build_params(ops)
+	method := "GET"
+	url := fmt.Sprintf("%stasklists/%s/tasks.json%s", conn.Account.Url, id, params)
+	reader, headers, err := request(conn.ApiToken, method, url)
+	if err != nil {
+		return tasks, *pages, err
+	}
+	//data, _ := ioutil.ReadAll(reader)
+	//fmt.Printf(string(data))
+	get_headers(headers, pages)
+	defer reader.Close()
+
+	err = json.NewDecoder(reader).Decode(&struct {
+		*Tasks `json:"todo-items"`
+	}{&tasks})
+	if err != nil {
+		return tasks, *pages, err
+	}
+
+	return tasks, *pages, nil
+}
+
+// A list of TaskLists.
+type TaskLists []TaskList
+
+// The TaskList structure.
+type TaskList struct {
+	Complete         bool        `json:"complete"`
+	Description      string      `json:"description"`
+	DLM              interface{} `json:"DLM"`
+	ID               string      `json:"id"`
+	IsTemplate       bool        `json:"isTemplate"`
+	MilestoneID      string      `json:"milestone-id"`
+	Name             string      `json:"name"`
+	Pinned           bool        `json:"pinned"`
+	Position         int         `json:"position"`
+	Private          bool        `json:"private"`
+	ProjectID        string      `json:"projectId"`
+	ProjectName      string      `json:"projectName"`
+	Status           string      `json:"status"`
+	UncompletedCount int         `json:"uncompleted-count"`
+}
+
+// GetProjectTaskListsOps is used to generate the query params for the
+// GetProjectTaskLists API call.
+type GetProjectTaskListsOps struct {
+	// Query tasks based on these values.
+	//
+	// Return the number of overdue tasks for each task list.
+	// Valid Input: "no", "yes"
+	// Default: "no"
+	GetOverdueCount string `param:"getOverdueCount"`
+	// Return the number of completed tasks for each task list.
+	// Valid Input: "no", "yes"
+	// Default: "no"
+	GetCompletedCount string `param:"getCompletedCount"`
+	// You can use the status option to restrict the Task Lists returned.
+	// Valid Input: "all", "active", "completed"
+	// Default: "active"
+	Status string `param:"status"`
+	// Add Milestone information in to the response, if a Milestone is attached to the Task List.
+	// Valid Input: "0", "1"
+	// Default: "0"
+	ShowMilestones string `param:"showMilestones"`
+	// Filter by the person responsible.
+	ResponsiblePartyID string `param:"responsible-party-id"`
+}
+
+// GetProjectTaskLists gets all the task lists available according to the specified
+// GetProjectTaskListsOps which are passed in and the ProjectID.
+//
+// ref: http://developer.teamwork.com/tasklists#get_all_task_list
+func (conn *Connection) GetProjectTaskLists(id string, ops *GetProjectTaskListsOps) (TaskLists, Pages, error) {
+	task_lists := make(TaskLists, 0)
+	pages := &Pages{}
+	params := build_params(ops)
+	method := "GET"
+	url := fmt.Sprintf("%sprojects/%s/tasklists.json%s", conn.Account.Url, id, params)
+	reader, headers, err := request(conn.ApiToken, method, url)
+	if err != nil {
+		return task_lists, *pages, err
+	}
+	//data, _ := ioutil.ReadAll(reader)
+	//fmt.Printf(string(data))
+	get_headers(headers, pages)
+	defer reader.Close()
+
+	err = json.NewDecoder(reader).Decode(&struct {
+		*TaskLists `json:"tasklists"`
+	}{&task_lists})
+	if err != nil {
+		return task_lists, *pages, err
+	}
+
+	return task_lists, *pages, nil
 }

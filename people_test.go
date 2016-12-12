@@ -10,14 +10,14 @@ func ExampleConnection_GetPeople() {
 	// get all people
 	True := true
 	people_ops := &teamwork.GetPeopleOps{
-		FullProfile:      &True,
-		ReturnProjectIds: &True,
+		FullProfile: &True,
 	}
 	people, pages, err := conn.GetPeople(people_ops)
 	if err != nil {
 		fmt.Printf("Error getting People: %s", err.Error())
 	}
 
+	fmt.Println("GetPeople")
 	fmt.Println("1. Username:", people[0].UserName)
 	fmt.Println("1. Full Name:", people[0].FirstName, people[0].LastName)
 	fmt.Println("on page #:", pages.Page)
@@ -32,6 +32,7 @@ func ExampleConnection_GetPerson() {
 		fmt.Printf("Error getting Person: %s", err.Error())
 	}
 
+	fmt.Println("GetPerson")
 	fmt.Println("Username:", person.UserName)
 	fmt.Println("Full Name:", person.FirstName, person.LastName)
 }

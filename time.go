@@ -36,11 +36,11 @@ type TimeEntry struct {
 	TaskEstimatedTime   string        `json:"taskEstimatedTime"`
 	TaskIsPrivate       string        `json:"taskIsPrivate"`
 	TaskIsSubTask       string        `json:"taskIsSubTask"`
+	TaskItemID          string        `json:"todo-item-id"`
+	TaskItemName        string        `json:"todo-item-name"`
+	TaskListID          string        `json:"todo-list-id"`
+	TaskListName        string        `json:"todo-list-name"`
 	TicketID            string        `json:"ticket-id"`
-	ToDoItemID          string        `json:"todo-item-id"`
-	ToDoItemName        string        `json:"todo-item-name"`
-	ToDoListID          string        `json:"todo-list-id"`
-	ToDoListName        string        `json:"todo-list-name"`
 	UpdatedDate         time.Time     `json:"updated-date"`
 }
 
@@ -143,7 +143,7 @@ func (conn *Connection) GetProjectTimeEntries(id string, ops *GetTimeEntriesOps)
 	return time_entries, *pages, nil
 }
 
-// GetTaskTimeEntries gets all the time entries available for a specific todo
+// GetTaskTimeEntries gets all the time entries available for a specific task
 // according to the specified GetTimeEntriesOps which are passed in.
 //
 // ref: http://developer.teamwork.com/timetracking#retrieve_all_time
@@ -170,4 +170,274 @@ func (conn *Connection) GetTaskTimeEntries(id string, ops *GetTimeEntriesOps) (T
 	}
 
 	return time_entries, *pages, nil
+}
+
+// Total Time over whole account.
+type TotalTime struct {
+	BillableHoursSum    string `json:"billable-hours-sum"`
+	BillableMinsSum     string `json:"billable-mins-sum"`
+	BilledHoursSum      string `json:"billed-hours-sum"`
+	BilledMinsSum       string `json:"billed-mins-sum"`
+	NonBillableHoursSum string `json:"non-billable-hours-sum"`
+	NonBillableMinsSum  string `json:"non-billable-mins-sum"`
+	NonBilledHoursSum   string `json:"non-billed-hours-sum"`
+	NonBilledMinsSum    string `json:"non-billed-mins-sum"`
+	TotalHoursSum       string `json:"total-hours-sum"`
+	TotalMinsSum        string `json:"total-mins-sum"`
+}
+
+type ProjectTotalTimes []ProjectTotalTime
+
+type ProjectTotalTime struct {
+	Company struct {
+		Name string `json:"name"`
+		ID   string `json:"id"`
+	} `json:"company"`
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	TimeEstimates struct {
+		ActiveHoursEstimated                string `json:"active-hours-estimated"`
+		ActiveMinsEstimated                 string `json:"active-mins-estimated"`
+		CompletedHoursEstimated             string `json:"completed-hours-estimated"`
+		CompletedMinsEstimated              string `json:"completed-mins-estimated"`
+		FilteredEstimatedHoursSum           string `json:"filtered-estimated-hours-sum"`
+		FilteredEstimatedMinsSum            string `json:"filtered-estimated-mins-sum"`
+		TotalHoursEstimated                 string `json:"total-hours-estimated"`
+		TotalMinsEstimated                  string `json:"total-mins-estimated"`
+		TotalWithTimeLoggedEstimatedDecimal string `json:"totalWithTimeLoggedEstimatedDecimal"`
+		TotalWithTimeLoggedEstimatedMins    string `json:"totalWithTimeLoggedEstimatedMins"`
+	} `json:"time-estimates"`
+	TimeTotals struct {
+		BillableHoursSum          string `json:"billable-hours-sum"`
+		BillableMinsSum           string `json:"billable-mins-sum"`
+		BilledHoursSum            string `json:"billed-hours-sum"`
+		BilledMinsSum             string `json:"billed-mins-sum"`
+		FilteredEstimatedHoursSum string `json:"filtered-estimated-hours-sum"`
+		FilteredEstimatedMinsSum  string `json:"filtered-estimated-mins-sum"`
+		NonBillableHoursSum       string `json:"non-billable-hours-sum"`
+		NonBillableMinsSum        string `json:"non-billable-mins-sum"`
+		NonBilledHoursSum         string `json:"non-billed-hours-sum"`
+		NonBilledMinsSum          string `json:"non-billed-mins-sum"`
+		TotalHoursSum             string `json:"total-hours-sum"`
+		TotalMinsSum              string `json:"total-mins-sum"`
+	} `json:"time-totals"`
+}
+
+type ProjectTaskListTotalTimes []ProjectTaskListTotalTime
+
+type ProjectTaskListTotalTime struct {
+	Company struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	} `json:"company"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	TaskList struct {
+		ID            string `json:"id"`
+		Name          string `json:"name"`
+		TimeEstimates struct {
+			ActiveHoursEstimated                string `json:"active-hours-estimated"`
+			ActiveMinsEstimated                 string `json:"active-mins-estimated"`
+			CompletedHoursEstimated             string `json:"completed-hours-estimated"`
+			CompletedMinsEstimated              string `json:"completed-mins-estimated"`
+			FilteredEstimatedHoursSum           string `json:"filtered-estimated-hours-sum"`
+			FilteredEstimatedMinsSum            string `json:"filtered-estimated-mins-sum"`
+			TotalHoursEstimated                 string `json:"total-hours-estimated"`
+			TotalMinsEstimated                  string `json:"total-mins-estimated"`
+			TotalWithTimeLoggedEstimatedDecimal string `json:"totalWithTimeLoggedEstimatedDecimal"`
+			TotalWithTimeLoggedEstimatedMins    string `json:"totalWithTimeLoggedEstimatedMins"`
+		} `json:"time-estimates"`
+		TimeTotals struct {
+			BillableHoursSum          string `json:"billable-hours-sum"`
+			BillableMinsSum           string `json:"billable-mins-sum"`
+			BilledHoursSum            string `json:"billed-hours-sum"`
+			BilledMinsSum             string `json:"billed-mins-sum"`
+			FilteredEstimatedHoursSum string `json:"filtered-estimated-hours-sum"`
+			FilteredEstimatedMinsSum  string `json:"filtered-estimated-mins-sum"`
+			NonBillableHoursSum       string `json:"non-billable-hours-sum"`
+			NonBillableMinsSum        string `json:"non-billable-mins-sum"`
+			NonBilledHoursSum         string `json:"non-billed-hours-sum"`
+			NonBilledMinsSum          string `json:"non-billed-mins-sum"`
+			TotalHoursSum             string `json:"total-hours-sum"`
+			TotalMinsSum              string `json:"total-mins-sum"`
+		} `json:"time-totals"`
+	} `json:"tasklist"`
+}
+
+type ProjectTaskTotalTimes []ProjectTaskTotalTime
+
+type ProjectTaskTotalTime struct {
+	Company struct {
+		Name string `json:"name"`
+		ID   string `json:"id"`
+	} `json:"company"`
+	ID       string `json:"id"`
+	Name     string `json:"name"`
+	TaskList struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+		Task struct {
+			ID            string `json:"id"`
+			Name          string `json:"name"`
+			TimeEstimates struct {
+				ActiveHoursEstimated                string `json:"active-hours-estimated"`
+				ActiveMinsEstimated                 string `json:"active-mins-estimated"`
+				CompletedHoursEstimated             string `json:"completed-hours-estimated"`
+				CompletedMinsEstimated              string `json:"completed-mins-estimated"`
+				FilteredEstimatedHoursSum           string `json:"filtered-estimated-hours-sum"`
+				FilteredEstimatedMinsSum            string `json:"filtered-estimated-mins-sum"`
+				TotalHoursEstimated                 string `json:"total-hours-estimated"`
+				TotalMinsEstimated                  string `json:"total-mins-estimated"`
+				TotalWithTimeLoggedEstimatedDecimal string `json:"totalWithTimeLoggedEstimatedDecimal"`
+				TotalWithTimeLoggedEstimatedMins    string `json:"totalWithTimeLoggedEstimatedMins"`
+			} `json:"time-estimates"`
+			TimeTotals struct {
+				BillableHoursSum          string `json:"billable-hours-sum"`
+				BillableMinsSum           string `json:"billable-mins-sum"`
+				BilledHoursSum            string `json:"billed-hours-sum"`
+				BilledMinsSum             string `json:"billed-mins-sum"`
+				FilteredEstimatedHoursSum string `json:"filtered-estimated-hours-sum"`
+				FilteredEstimatedMinsSum  string `json:"filtered-estimated-mins-sum"`
+				NonBillableHoursSum       string `json:"non-billable-hours-sum"`
+				NonBillableMinsSum        string `json:"non-billable-mins-sum"`
+				NonBilledHoursSum         string `json:"non-billed-hours-sum"`
+				NonBilledMinsSum          string `json:"non-billed-mins-sum"`
+				TotalHoursSum             string `json:"total-hours-sum"`
+				TotalMinsSum              string `json:"total-mins-sum"`
+			} `json:"time-totals"`
+		} `json:"task"`
+	} `json:"tasklist"`
+}
+
+// GetTotalTimeOps is used to generate the query params for the
+// GetTotalTime API call.
+type GetTotalTimeOps struct {
+	// Query time entries based on these values.
+	//
+	// Only show totals for userId passed
+	// Default: 0 (All Users)
+	UserId *int `param:"userId"`
+	// Only show totals from a specific date
+	// Format: "YYYYMMDD"
+	FromDate string `param:"fromDate"`
+	// Only show totals up to a specific date
+	// Format: "YYYYMMDD"
+	ToDate string `param:"toDate"`
+	// Only show totals from a specific time in conjunction with fromDate
+	// Format: "HH:MM"
+	FromTime string `param:"fromTime"`
+	// Only show totals up to a specific time in conjunction with toDate
+	// Format: "HH:MM"
+	ToTime string `param:"toTime"`
+	// Filter the time totals to those in Active projects, Archived projects or All projects.
+	// Valid Input: "all", "active", "archived"
+	ProjectType string `param:"projectType"`
+}
+
+// GetTotalTime gets the total time across all projects according to the specified
+// GetTotalTimeOps which are passed in.
+//
+// ref: http://developer.teamwork.com/timetracking#time_totals
+func (conn *Connection) GetTotalTime(ops *GetTotalTimeOps) (TotalTime, error) {
+	total_time := &TotalTime{}
+	params := build_params(ops)
+	method := "GET"
+	url := fmt.Sprintf("%stime/total.json%s", conn.Account.Url, params)
+	reader, _, err := request(conn.ApiToken, method, url)
+	if err != nil {
+		return *total_time, err
+	}
+	//data, _ := ioutil.ReadAll(reader)
+	//fmt.Printf(string(data))
+	defer reader.Close()
+
+	err = json.NewDecoder(reader).Decode(&struct {
+		*TotalTime `json:"time-totals"`
+	}{total_time})
+	if err != nil {
+		return *total_time, err
+	}
+
+	return *total_time, nil
+}
+
+// GetProjectTotalTime gets total time for a specific project according to the specified
+// GetTotalTimeOps which are passed in.
+//
+// ref: http://developer.teamwork.com/timetracking#time_totals
+func (conn *Connection) GetProjectTotalTime(id string, ops *GetTotalTimeOps) (ProjectTotalTimes, error) {
+	project_total_time := make(ProjectTotalTimes, 0)
+	params := build_params(ops)
+	method := "GET"
+	url := fmt.Sprintf("%sprojects/%s/time/total.json%s", conn.Account.Url, id, params)
+	reader, _, err := request(conn.ApiToken, method, url)
+	if err != nil {
+		return project_total_time, err
+	}
+	//data, _ := ioutil.ReadAll(reader)
+	//fmt.Printf(string(data))
+	defer reader.Close()
+
+	err = json.NewDecoder(reader).Decode(&struct {
+		*ProjectTotalTimes `json:"projects"`
+	}{&project_total_time})
+	if err != nil {
+		return project_total_time, err
+	}
+
+	return project_total_time, nil
+}
+
+// GetTaskListTotalTime gets total time for a specific task list according to the specified
+// GetTotalTimeOps which are passed in.
+//
+// ref: http://developer.teamwork.com/timetracking#time_totals
+func (conn *Connection) GetTaskListTotalTime(id string, ops *GetTotalTimeOps) (ProjectTaskListTotalTimes, error) {
+	task_list_total_time := make(ProjectTaskListTotalTimes, 0)
+	params := build_params(ops)
+	method := "GET"
+	url := fmt.Sprintf("%stasklists/%s/time/total.json%s", conn.Account.Url, id, params)
+	reader, _, err := request(conn.ApiToken, method, url)
+	if err != nil {
+		return task_list_total_time, err
+	}
+	//data, _ := ioutil.ReadAll(reader)
+	//fmt.Printf(string(data))
+	defer reader.Close()
+
+	err = json.NewDecoder(reader).Decode(&struct {
+		*ProjectTaskListTotalTimes `json:"projects"`
+	}{&task_list_total_time})
+	if err != nil {
+		return task_list_total_time, err
+	}
+
+	return task_list_total_time, nil
+}
+
+// GetTaskTotalTime gets total time for a specific task according to the specified
+// GetTotalTimeOps which are passed in.
+//
+// ref: http://developer.teamwork.com/timetracking#time_totals
+func (conn *Connection) GetTaskTotalTime(id string, ops *GetTotalTimeOps) (ProjectTaskTotalTimes, error) {
+	task_total_time := make(ProjectTaskTotalTimes, 0)
+	params := build_params(ops)
+	method := "GET"
+	url := fmt.Sprintf("%stasks/%s/time/total.json%s", conn.Account.Url, id, params)
+	reader, _, err := request(conn.ApiToken, method, url)
+	if err != nil {
+		return task_total_time, err
+	}
+	//data, _ := ioutil.ReadAll(reader)
+	//fmt.Printf(string(data))
+	defer reader.Close()
+
+	err = json.NewDecoder(reader).Decode(&struct {
+		*ProjectTaskTotalTimes `json:"projects"`
+	}{&task_total_time})
+	if err != nil {
+		return task_total_time, err
+	}
+
+	return task_total_time, nil
 }
