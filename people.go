@@ -67,8 +67,32 @@ type Person struct {
 	Notes       string `json:"notes"`
 	OpenID      string `json:"openId"`
 	Permissions struct {
-		CanAddProjects  bool `json:"can-add-projects"`
-		CanManagePeople bool `json:"can-manage-people"`
+		AddFiles                          string `json:"add-files"`
+		AddLinks                          string `json:"add-links"`
+		AddMessages                       string `json:"add-messages"`
+		AddMilestones                     string `json:"add-milestones"`
+		AddNotebooks                      string `json:"add-notebooks"`
+		AddPeopleToProject                string `json:"add-people-to-project"`
+		AddTaskLists                      string `json:"add-taskLists"`
+		AddTasks                          string `json:"add-tasks"`
+		AddTime                           string `json:"add-time"`
+		CanAddProjects                    bool   `json:"can-add-projects"`
+		CanBeAssignedToTasksAndMilestones string `json:"can-be-assigned-to-tasks-and-milestones"`
+		CanManagePeople                   bool   `json:"can-manage-people"`
+		CanReceiveEmail                   string `json:"can-receive-email"`
+		EditAllTasks                      string `json:"edit-all-tasks"`
+		IsObserving                       string `json:"is-observing"`
+		ProjectAdministrator              string `json:"project-administrator"`
+		SetPrivacy                        string `json:"set-privacy"`
+		ViewAllTimeLogs                   string `json:"view-all-time-logs"`
+		ViewEstimatedTime                 string `json:"view-estimated-time"`
+		ViewInvoices                      string `json:"view-invoices"`
+		ViewLinks                         string `json:"view-links"`
+		ViewMessagesAndFiles              string `json:"view-messages-and-files"`
+		ViewNotebooks                     string `json:"view-notebooks"`
+		ViewRiskRegister                  string `json:"view-risk-register"`
+		ViewTasksAndMilestones            string `json:"view-tasks-and-milestones"`
+		ViewTime                          string `json:"view-time"`
 	} `json:"permissions"`
 	PhoneNumberFax         string `json:"phone-number-fax"`
 	PhoneNumberHome        string `json:"phone-number-home"`
@@ -129,6 +153,66 @@ func (conn *Connection) GetPeople(ops *GetPeopleOps) (People, Pages, error) {
 	if err != nil {
 		return people, *pages, err
 	}
+	//data, _ := ioutil.ReadAll(reader)
+	//fmt.Printf(string(data))
+	get_headers(headers, pages)
+	defer reader.Close()
+
+	err = json.NewDecoder(reader).Decode(&struct {
+		*People `json:"people"`
+	}{&people})
+	if err != nil {
+		return people, *pages, err
+	}
+
+	return people, *pages, nil
+}
+
+// GetProjectPeople gets project people available according to the specified
+// GetPeopleOps and company id passed in.
+//
+// ref: http://developer.teamwork.com/people#get_all_people_(w
+func (conn *Connection) GetProjectPeople(id string, ops *GetPeopleOps) (People, Pages, error) {
+	people := make(People, 0)
+	pages := &Pages{}
+	params := build_params(ops)
+	method := "GET"
+	url := fmt.Sprintf("%sprojects/%s/people.json%s", conn.Account.Url, id, params)
+	reader, headers, err := request(conn.ApiToken, method, url)
+	if err != nil {
+		return people, *pages, err
+	}
+	//data, _ := ioutil.ReadAll(reader)
+	//fmt.Printf(string(data))
+	get_headers(headers, pages)
+	defer reader.Close()
+
+	err = json.NewDecoder(reader).Decode(&struct {
+		*People `json:"people"`
+	}{&people})
+	if err != nil {
+		return people, *pages, err
+	}
+
+	return people, *pages, nil
+}
+
+// GetCompanyPeople gets company people available according to the specified
+// GetPeopleOps and company id passed in.
+//
+// ref: http://developer.teamwork.com/people#get_people_(withi
+func (conn *Connection) GetCompanyPeople(id string, ops *GetPeopleOps) (People, Pages, error) {
+	people := make(People, 0)
+	pages := &Pages{}
+	params := build_params(ops)
+	method := "GET"
+	url := fmt.Sprintf("%scompanies/%s/people.json%s", conn.Account.Url, id, params)
+	reader, headers, err := request(conn.ApiToken, method, url)
+	if err != nil {
+		return people, *pages, err
+	}
+	//data, _ := ioutil.ReadAll(reader)
+	//fmt.Printf(string(data))
 	get_headers(headers, pages)
 	defer reader.Close()
 
@@ -153,6 +237,8 @@ func (conn *Connection) GetPerson(id string) (Person, error) {
 	if err != nil {
 		return *person, err
 	}
+	//data, _ := ioutil.ReadAll(reader)
+	//fmt.Printf(string(data))
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
