@@ -45,10 +45,10 @@ type Person struct {
 	ImService               string    `json:"im-service"`
 	// bool in People and string in Person :(
 	//InOwnerCompany          bool      `json:"in-owner-company"`
-	IsClockedIn   bool      `json:"isClockedIn"` // Person only
-	LastActive    string    `json:"last-active"`
-	LastChangedOn time.Time `json:"last-changed-on"`
-	//LastLogin              time.Time `json:"last-login"` // fails if ""
+	IsClockedIn bool   `json:"isClockedIn"` // Person only
+	LastActive  string `json:"last-active"`
+	//LastChangedOn time.Time `json:"last-changed-on"` // fails if empty ""
+	//LastLogin              time.Time `json:"last-login"` // fails if empty ""
 	LastName     string `json:"last-name"`
 	Localization struct {
 		DateFormat            string `json:"dateFormat"`
@@ -120,7 +120,7 @@ type Person struct {
 	UserUUID              string        `json:"userUUID"`
 	UseShorthandDurations bool          `json:"useShorthandDurations"`
 	UserInvited           string        `json:"user-invited"`
-	//UserInvitedDate       time.Time     `json:"user-invited-date"` // fails if ""
+	//UserInvitedDate       time.Time     `json:"user-invited-date"` // fails if empty ""
 	UserInvitedStatus string `json:"user-invited-status"`
 }
 
