@@ -1,6 +1,7 @@
 package teamwork
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -74,23 +75,7 @@ func Connect(ApiToken string) (*Connection, error) {
 
 // request is the base level function for calling the TeamWork API.
 func request(token, method, url string) (io.ReadCloser, http.Header, error) {
-	client := &http.Client{}
-	req, err := http.NewRequest(method, url, nil) // TODO: Add payload to support POST
-	if err != nil {
-		log.Printf("NewRequest: ", err)
-		return nil, nil, err
-	}
-	req.Header.Set("Accept", "application/json")
-	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(token, "notused")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Printf("Do: ", err)
-		return nil, nil, err
-	}
-
-	return resp.Body, resp.Header, nil
+	return postrequest(token, method, url, nil)
 }
 
 // build_params takes a struct and builds query params based
@@ -202,4 +187,31 @@ func get_headers(headers http.Header, obj interface{}) {
 			}
 		}
 	}
+}
+
+// request is the base level function for calling the TeamWork API.
+func postrequest(token, method, url string, data []byte) (io.ReadCloser, http.Header, error) {
+	var err error
+	var req *http.Request
+	client := &http.Client{}
+	if data != nil {
+		req, err = http.NewRequest(method, url, bytes.NewBuffer(data))
+	} else {
+		req, err = http.NewRequest(method, url, nil)
+	}
+	if err != nil {
+		log.Printf("NewRequest: ", err)
+		return nil, nil, err
+	}
+	req.Header.Set("Accept", "application/json")
+	req.Header.Set("Content-Type", "application/json")
+	req.SetBasicAuth(token, "notused")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		log.Printf("Do: ", err)
+		return nil, nil, err
+	}
+
+	return resp.Body, resp.Header, nil
 }
