@@ -70,7 +70,7 @@ type GetTimeEntriesOps struct {
 	// Valid Input: "ASC", "DESC"
 	SortOrder string `param:"sortorder"`
 	// Return time logs for a specific user only
-	UserID string `param:"userId"`
+	UserID int `param:"userId"`
 	// Filter the Time Entries to those that are Billable or Not Billable.
 	// Valid Input: "billable", "nonbillable"
 	BillableType string `param:"billableType"`
@@ -83,6 +83,9 @@ type GetTimeEntriesOps struct {
 	// Filter time entries to include deleted time sheet entries or not.
 	// Valid Input: true, false
 	ShowDeleted *bool `param:"showDeleted"`
+	// A page contains 100 entries, but you can increase the page size to a
+	// maximum of 500 entries by using 'pageSize' parameter.
+	PageSize string `param:"pageSize"`
 }
 
 // GetTimeEntries gets all the time entries available according to the specified

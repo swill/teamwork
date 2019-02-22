@@ -56,7 +56,7 @@ type Connection struct {
 // TeamWork via other functions.
 func Connect(ApiToken string) (*Connection, error) {
 	method := "GET"
-	url := "http://authenticate.teamworkpm.net/authenticate.json"
+	url := "https://api.teamwork.com/authenticate.json"
 	reader, _, err := request(ApiToken, method, url)
 	if err != nil {
 		return nil, err
@@ -84,6 +84,13 @@ func request(token, method, url string) (io.ReadCloser, http.Header, error) {
 	req.Header.Set("Content-Type", "application/json")
 	req.SetBasicAuth(token, "notused")
 
+	// // Save a copy of this request for debugging.
+	// req_dump, err := httputil.DumpRequest(req, true)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// fmt.Println(string(req_dump))
+
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Printf("Do: ", err)
@@ -107,13 +114,29 @@ func build_params(ops interface{}) string {
 
 		is_pointer := false
 		var kind reflect.Kind
-		// Handle either strings or pointers
+		// Handle variable types
 		switch {
 		case v.Field(i).Kind() == reflect.Ptr:
 			kind = v.Field(i).Elem().Kind()
 			is_pointer = true
 		case v.Field(i).Kind() == reflect.String:
 			param_value = v.Field(i).Interface().(string)
+		case v.Field(i).Kind() == reflect.Bool:
+			param_value = strconv.FormatBool(v.Field(i).Interface().(bool))
+		case v.Field(i).Kind() == reflect.Int:
+			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int)), 10)
+		case v.Field(i).Kind() == reflect.Int8:
+			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int8)), 10)
+		case v.Field(i).Kind() == reflect.Int16:
+			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int16)), 10)
+		case v.Field(i).Kind() == reflect.Int32:
+			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int32)), 10)
+		case v.Field(i).Kind() == reflect.Int64:
+			param_value = strconv.FormatInt(v.Field(i).Interface().(int64), 10)
+		case v.Field(i).Kind() == reflect.Float32:
+			param_value = strconv.FormatFloat(float64(v.Field(i).Interface().(float32)), 'f', -1, 64)
+		case v.Field(i).Kind() == reflect.Float64:
+			param_value = strconv.FormatFloat(v.Field(i).Interface().(float64), 'f', -1, 64)
 		}
 
 		// handle pointers
