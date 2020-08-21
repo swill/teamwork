@@ -6,6 +6,8 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
+	"path"
 	"reflect"
 	"strconv"
 	"strings"
@@ -54,10 +56,15 @@ type Connection struct {
 // Connect is the starting point to using the TeamWork API.
 // This function returns a Connection which is used to query
 // TeamWork via other functions.
-func Connect(ApiToken string) (*Connection, error) {
+func Connect(baseUrl string, ApiToken string) (*Connection, error) {
 	method := "GET"
-	url := "https://api.teamwork.com/authenticate.json"
-	reader, _, err := request(ApiToken, method, url)
+
+	u, err := url.Parse(baseUrl)
+	u.Path = path.Join(u.Path, "authenticate.json")
+	url := u.String()
+	// log.Println(url)
+
+	reader, _, err := request(ApiToken, method, url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -73,9 +80,9 @@ func Connect(ApiToken string) (*Connection, error) {
 }
 
 // request is the base level function for calling the TeamWork API.
-func request(token, method, url string) (io.ReadCloser, http.Header, error) {
+func request(token, method, url string, body io.Reader) (io.ReadCloser, http.Header, error) {
 	client := &http.Client{}
-	req, err := http.NewRequest(method, url, nil) // TODO: Add payload to support POST
+	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		log.Printf("NewRequest: ", err)
 		return nil, nil, err
