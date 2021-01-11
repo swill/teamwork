@@ -97,6 +97,13 @@ func request(token, method, url string) (io.ReadCloser, http.Header, error) {
 		return nil, nil, err
 	}
 
+	// // Save a copy of this response for debugging.
+	// resp_dump, err := httputil.DumpResponse(resp, true)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// }
+	// fmt.Println(string(resp_dump))
+
 	return resp.Body, resp.Header, nil
 }
 
