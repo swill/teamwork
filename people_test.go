@@ -1,12 +1,22 @@
-package teamwork
+package teamwork_test
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/swill/teamwork"
 )
 
 func ExampleConnection_GetPeople() {
+	// setup the teamwork connection
+	baseURL := "a teamwork baseURL"
+	apiToken := "a_teamwork_apiToken"
+	conn, err := teamwork.Connect(baseURL, apiToken)
+	if err != nil {
+		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// get all people
 	True := true
 	peopleOps := &teamwork.GetPeopleOps{
@@ -26,11 +36,21 @@ func ExampleConnection_GetPeople() {
 }
 
 func ExampleConnection_GetProjectPeople() {
+	// setup the teamwork connection
+	baseURL := "a teamwork baseURL"
+	apiToken := "a_teamwork_apiToken"
+	conn, err := teamwork.Connect(baseURL, apiToken)
+	if err != nil {
+		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// get project people
-	peopleOps = &teamwork.GetPeopleOps{
+	True := true
+	peopleOps := &teamwork.GetPeopleOps{
 		FullProfile: &True,
 	}
-	people, pages, err = conn.GetProjectPeople("158721", peopleOps)
+	people, pages, err := conn.GetProjectPeople("158721", peopleOps)
 	if err != nil {
 		fmt.Printf("Error getting Project People: %s", err.Error())
 	}
@@ -44,11 +64,21 @@ func ExampleConnection_GetProjectPeople() {
 }
 
 func ExampleConnection_GetCompanyPeople() {
+	// setup the teamwork connection
+	baseURL := "a teamwork baseURL"
+	apiToken := "a_teamwork_apiToken"
+	conn, err := teamwork.Connect(baseURL, apiToken)
+	if err != nil {
+		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// get company people
-	peopleOps = &teamwork.GetPeopleOps{
+	True := true
+	peopleOps := &teamwork.GetPeopleOps{
 		FullProfile: &True,
 	}
-	people, pages, err = conn.GetCompanyPeople(conn.Account.CompanyID, peopleOps)
+	people, pages, err := conn.GetCompanyPeople(conn.Account.CompanyID, peopleOps)
 	if err != nil {
 		fmt.Printf("Error getting Company People: %s", err.Error())
 	}
@@ -62,6 +92,15 @@ func ExampleConnection_GetCompanyPeople() {
 }
 
 func ExampleConnection_GetPerson() {
+	// setup the teamwork connection
+	baseURL := "a teamwork baseURL"
+	apiToken := "a_teamwork_apiToken"
+	conn, err := teamwork.Connect(baseURL, apiToken)
+	if err != nil {
+		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// get one person
 	person, err := conn.GetPerson("85457")
 	if err != nil {

@@ -1,12 +1,22 @@
-package teamwork
+package teamwork_test
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/swill/teamwork"
 )
 
 func ExampleConnection_GetProjects() {
+	// setup the teamwork connection
+	baseURL := "a teamwork baseURL"
+	apiToken := "a_teamwork_apiToken"
+	conn, err := teamwork.Connect(baseURL, apiToken)
+	if err != nil {
+		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// get all projects
 	projectsOps := &teamwork.GetProjectsOps{
 		Status: "ALL",
@@ -25,6 +35,15 @@ func ExampleConnection_GetProjects() {
 }
 
 func ExampleConnection_GetProject() {
+	// setup the teamwork connection
+	baseURL := "a teamwork baseURL"
+	apiToken := "a_teamwork_apiToken"
+	conn, err := teamwork.Connect(baseURL, apiToken)
+	if err != nil {
+		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// get one project
 	True := true
 	projectOps := &teamwork.GetProjectOps{

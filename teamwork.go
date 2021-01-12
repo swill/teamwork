@@ -84,7 +84,7 @@ func request(token, method, url string, body io.Reader) (io.ReadCloser, http.Hea
 	client := &http.Client{}
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		log.Printf("NewRequest: ", err)
+		log.Println("NewRequest:", err)
 		return nil, nil, err
 	}
 	req.Header.Set("Accept", "application/json")
@@ -100,7 +100,7 @@ func request(token, method, url string, body io.Reader) (io.ReadCloser, http.Hea
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Printf("Do: ", err)
+		log.Println("Do:", err)
 		return nil, nil, err
 	}
 

@@ -1,4 +1,4 @@
-package teamwork
+package teamwork_test
 
 import (
 	"fmt"

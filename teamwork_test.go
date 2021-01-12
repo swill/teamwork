@@ -1,4 +1,4 @@
-package teamwork
+package teamwork_test
 
 import (
 	"fmt"
@@ -9,8 +9,9 @@ import (
 
 func ExampleConnect() {
 	// setup the teamwork connection
+	baseURL := "a teamwork baseURL"
 	apiToken := "a_teamwork_apiToken"
-	conn, err := teamwork.Connect(apiToken)
+	conn, err := teamwork.Connect(baseURL, apiToken)
 	if err != nil {
 		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
 		os.Exit(1)
