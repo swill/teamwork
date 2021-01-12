@@ -149,7 +149,7 @@ func (conn *Connection) GetPeople(ops *GetPeopleOps) (People, Pages, error) {
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%speople.json%s", conn.Account.Url, params)
-	reader, headers, err := request(conn.ApiToken, method, url)
+	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return people, *pages, err
 	}
@@ -178,7 +178,7 @@ func (conn *Connection) GetProjectPeople(id string, ops *GetPeopleOps) (People, 
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects/%s/people.json%s", conn.Account.Url, id, params)
-	reader, headers, err := request(conn.ApiToken, method, url)
+	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return people, *pages, err
 	}
@@ -207,7 +207,7 @@ func (conn *Connection) GetCompanyPeople(id string, ops *GetPeopleOps) (People, 
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%scompanies/%s/people.json%s", conn.Account.Url, id, params)
-	reader, headers, err := request(conn.ApiToken, method, url)
+	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return people, *pages, err
 	}
@@ -233,12 +233,34 @@ func (conn *Connection) GetPerson(id string) (Person, error) {
 	person := &Person{}
 	method := "GET"
 	url := fmt.Sprintf("%speople/%s.json", conn.Account.Url, id)
-	reader, _, err := request(conn.ApiToken, method, url)
+	reader, _, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return *person, err
 	}
 	//data, _ := ioutil.ReadAll(reader)
 	//fmt.Printf(string(data))
+	defer reader.Close()
+
+	err = json.NewDecoder(reader).Decode(&struct {
+		*Person `json:"person"`
+	}{person})
+	if err != nil {
+		return *person, err
+	}
+
+	return *person, nil
+}
+
+func (conn *Connection) GetCurrentPerson() (Person, error) {
+	person := &Person{}
+	method := "GET"
+	url := fmt.Sprintf("%sme.json", conn.Account.Url)
+	reader, _, err := request(conn.ApiToken, method, url, nil)
+	if err != nil {
+		return *person, err
+	}
+	// data, _ := ioutil.ReadAll(reader)
+	// fmt.Printf(string(data))
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {

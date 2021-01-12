@@ -56,6 +56,7 @@ type Task struct {
 	LastChangedOn             time.Time     `json:"last-changed-on"`
 	LockdownID                string        `json:"lockdownId"`
 	Order                     int           `json:"order"`
+	Name                      string        `json:"todo-list-name"`
 	ParentTaskID              string        `json:"parentTaskId"`
 	Position                  int           `json:"position"`
 	Predecessors              []interface{} `json:"predecessors"`
@@ -187,7 +188,7 @@ func (conn *Connection) GetTasks(ops *GetTasksOps) (Tasks, Pages, error) {
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%stasks.json%s", conn.Account.Url, params)
-	reader, headers, err := request(conn.ApiToken, method, url)
+	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return tasks, *pages, err
 	}
@@ -216,12 +217,12 @@ func (conn *Connection) GetProjectTasks(id string, ops *GetTasksOps) (Tasks, Pag
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects/%s/tasks.json%s", conn.Account.Url, id, params)
-	reader, headers, err := request(conn.ApiToken, method, url)
+	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return tasks, *pages, err
 	}
-	//data, _ := ioutil.ReadAll(reader)
-	//fmt.Printf(string(data))
+	// data, _ := ioutil.ReadAll(reader)
+	// fmt.Printf(string(data))
 	get_headers(headers, pages)
 	defer reader.Close()
 
@@ -245,7 +246,7 @@ func (conn *Connection) GetTaskListTasks(id string, ops *GetTasksOps) (Tasks, Pa
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%stasklists/%s/tasks.json%s", conn.Account.Url, id, params)
-	reader, headers, err := request(conn.ApiToken, method, url)
+	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return tasks, *pages, err
 	}
@@ -320,7 +321,7 @@ func (conn *Connection) GetProjectTaskLists(id string, ops *GetProjectTaskListsO
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects/%s/tasklists.json%s", conn.Account.Url, id, params)
-	reader, headers, err := request(conn.ApiToken, method, url)
+	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return task_lists, *pages, err
 	}

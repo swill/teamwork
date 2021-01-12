@@ -95,6 +95,8 @@ type GetProjectsOps struct {
 	// The project was updated after this time.
 	// Format: "15:21"
 	UpdatedAfterTime string `param:"updatedAfterTime"`
+	// Filter project by user
+	UserID string `param:"userId"`
 }
 
 // GetProjects gets all the projects available according to the specified
@@ -107,7 +109,7 @@ func (conn *Connection) GetProjects(ops *GetProjectsOps) (Projects, Pages, error
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects.json%s", conn.Account.Url, params)
-	reader, headers, err := request(conn.ApiToken, method, url)
+	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return projects, *pages, err
 	}
@@ -142,7 +144,7 @@ func (conn *Connection) GetProject(id string, ops *GetProjectOps) (Project, erro
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects/%s.json%s", conn.Account.Url, id, params)
-	reader, _, err := request(conn.ApiToken, method, url)
+	reader, _, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return *project, err
 	}

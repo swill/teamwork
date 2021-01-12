@@ -1,6 +1,7 @@
 package teamwork
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"time"
@@ -88,6 +89,39 @@ type GetTimeEntriesOps struct {
 	PageSize string `param:"pageSize"`
 }
 
+// CreateTimeEntryOps is used to generate the query params for the
+// CreateTimeEntry* API call.
+type CreateTimeEntryOps struct {
+	// Description of time entry
+	Description string `json:"description"`
+	// ID of the user for the entry
+	PersonID string `json:"person-id"`
+	// Start Date of the time entry in YYYYMMDD format
+	Date string `json:"date"`
+	// Start Time of the time entry in HH:MM:SS format
+	Time string `json:"time"`
+	// Hours logged for the time entry
+	Hours string `json:"hours"`
+	// Minutes logged for the time entry
+	Minutes string `json:"minutes"`
+	// billable flag
+	// Valid Input: true, false
+	IsBillable string `json:"isbillable,omitempty"`
+	// task associated with this entry
+	TaskID string `json:"task-id,omitempty"`
+}
+
+// CreateTimeEntryResponse captures the response returned from a create time entry action
+type CreateTimeEntryResponse struct {
+	ID     string `json:"timeLogId"`
+	Status string `json:"STATUS"`
+}
+
+// DeleteTimeEntryResponse captures the response returned from an update time entry action
+type DeleteTimeEntryResponse struct {
+	Status string `json:"STATUS"`
+}
+
 // GetTimeEntries gets all the time entries available according to the specified
 // GetTimeEntriesOps which are passed in.
 //
@@ -98,12 +132,12 @@ func (conn *Connection) GetTimeEntries(ops *GetTimeEntriesOps) (TimeEntries, Pag
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%stime_entries.json%s", conn.Account.Url, params)
-	reader, headers, err := request(conn.ApiToken, method, url)
+	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return time_entries, *pages, err
 	}
-	//data, _ := ioutil.ReadAll(reader)
-	//fmt.Printf(string(data))
+	// data, _ := ioutil.ReadAll(reader)
+	// fmt.Printf(string(data))
 	get_headers(headers, pages)
 	defer reader.Close()
 
@@ -127,7 +161,7 @@ func (conn *Connection) GetProjectTimeEntries(id string, ops *GetTimeEntriesOps)
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects/%s/time_entries.json%s", conn.Account.Url, id, params)
-	reader, headers, err := request(conn.ApiToken, method, url)
+	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return time_entries, *pages, err
 	}
@@ -146,6 +180,92 @@ func (conn *Connection) GetProjectTimeEntries(id string, ops *GetTimeEntriesOps)
 	return time_entries, *pages, nil
 }
 
+// CreateTimeEntryForProject creates a time entry for a project
+// according to the specified CreateTimeEntryOps which are passed in
+//
+// ref: https://developer.teamwork.com/projects/api-v1/ref/time-tracking/post-projects-id-time-entries-json
+func (conn *Connection) CreateTimeEntryForProject(projectID string, ops *CreateTimeEntryOps) (*CreateTimeEntryResponse, error) {
+	jsonBody, err := json.Marshal(struct {
+		TimeEntry *CreateTimeEntryOps `json:"time-entry"`
+	}{TimeEntry: ops})
+	// fmt.Println(string(jsonBody))
+	createResponse := &CreateTimeEntryResponse{}
+	method := "POST"
+	url := fmt.Sprintf("%sprojects/%s/time_entries.json", conn.Account.Url, projectID)
+	reader, _, err := request(conn.ApiToken, method, url, bytes.NewBuffer(jsonBody))
+	if err != nil {
+		return nil, err
+	}
+	// data, _ := ioutil.ReadAll(reader)
+	// fmt.Printf(string(data))
+	// get_headers(headers, pages)
+	defer reader.Close()
+
+	err = json.NewDecoder(reader).Decode(&struct {
+		*CreateTimeEntryResponse `json:"time-entry"`
+	}{createResponse})
+	if err != nil {
+		return nil, err
+	}
+
+	return createResponse, nil
+}
+
+// CreateTimeEntryForTask creates a time entry for a task
+// according to the specified CreateTimeEntryOps which are passed in
+//
+// ref: https://developer.teamwork.com/projects/api-v1/ref/time-tracking/post-projects-id-time-entries-json
+func (conn *Connection) CreateTimeEntryForTask(taskID string, ops *CreateTimeEntryOps) (*CreateTimeEntryResponse, error) {
+	jsonBody, err := json.Marshal(struct {
+		TimeEntry *CreateTimeEntryOps `json:"time-entry"`
+	}{TimeEntry: ops})
+	// fmt.Println(string(jsonBody))
+	createResponse := &CreateTimeEntryResponse{}
+	method := "POST"
+	url := fmt.Sprintf("%stasks/%s/time_entries.json", conn.Account.Url, taskID)
+	reader, _, err := request(conn.ApiToken, method, url, bytes.NewBuffer(jsonBody))
+	if err != nil {
+		return nil, err
+	}
+	// data, _ := ioutil.ReadAll(reader)
+	// fmt.Printf(string(data))
+	// get_headers(headers, pages)
+	defer reader.Close()
+
+	err = json.NewDecoder(reader).Decode(&createResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	return createResponse, nil
+}
+
+// DeleteTimeEntry deletes a specific time entry
+//
+// ref: https://developer.teamwork.com/projects/api-v1/ref/time-tracking/delete-time-entries-id-json
+func (conn *Connection) DeleteTimeEntry(id string) (*DeleteTimeEntryResponse, error) {
+	method := "DELETE"
+	url := fmt.Sprintf("%stime_entries/%s.json", conn.Account.Url, id)
+	reader, _, err := request(conn.ApiToken, method, url, nil)
+	if err != nil {
+		return nil, err
+	}
+	// data, _ := ioutil.ReadAll(reader)
+	// fmt.Printf(string(data))
+	// get_headers(headers, pages)
+	defer reader.Close()
+
+	deleteResponse := &DeleteTimeEntryResponse{}
+	err = json.NewDecoder(reader).Decode(deleteResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	// fmt.Printf("%+v", deleteResponse)
+
+	return deleteResponse, nil
+}
+
 // GetTaskTimeEntries gets all the time entries available for a specific task
 // according to the specified GetTimeEntriesOps which are passed in.
 //
@@ -156,7 +276,7 @@ func (conn *Connection) GetTaskTimeEntries(id string, ops *GetTimeEntriesOps) (T
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%stasks/%s/time_entries.json%s", conn.Account.Url, id, params)
-	reader, headers, err := request(conn.ApiToken, method, url)
+	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return time_entries, *pages, err
 	}
@@ -346,7 +466,7 @@ func (conn *Connection) GetTotalTime(ops *GetTotalTimeOps) (TotalTime, error) {
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%stime/total.json%s", conn.Account.Url, params)
-	reader, _, err := request(conn.ApiToken, method, url)
+	reader, _, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return *total_time, err
 	}
@@ -373,7 +493,7 @@ func (conn *Connection) GetProjectTotalTime(id string, ops *GetTotalTimeOps) (Pr
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects/%s/time/total.json%s", conn.Account.Url, id, params)
-	reader, _, err := request(conn.ApiToken, method, url)
+	reader, _, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return project_total_time, err
 	}
@@ -400,7 +520,7 @@ func (conn *Connection) GetTaskListTotalTime(id string, ops *GetTotalTimeOps) (P
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%stasklists/%s/time/total.json%s", conn.Account.Url, id, params)
-	reader, _, err := request(conn.ApiToken, method, url)
+	reader, _, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return task_list_total_time, err
 	}
@@ -427,7 +547,7 @@ func (conn *Connection) GetTaskTotalTime(id string, ops *GetTotalTimeOps) (Proje
 	params := build_params(ops)
 	method := "GET"
 	url := fmt.Sprintf("%stasks/%s/time/total.json%s", conn.Account.Url, id, params)
-	reader, _, err := request(conn.ApiToken, method, url)
+	reader, _, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return task_total_time, err
 	}
