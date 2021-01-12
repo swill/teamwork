@@ -1,5 +1,6 @@
 package teamwork
 
+// Pages provides a way to page requests
 // The X-Page(s) headers that are returned with queries.
 // The struct is populated by the headers when returning
 // lists of data from TeamWork.  Use thic concept to
