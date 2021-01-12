@@ -9,10 +9,10 @@ import (
 func ExampleConnection_GetPeople() {
 	// get all people
 	True := true
-	people_ops := &teamwork.GetPeopleOps{
+	peopleOps := &teamwork.GetPeopleOps{
 		FullProfile: &True,
 	}
-	people, pages, err := conn.GetPeople(people_ops)
+	people, pages, err := conn.GetPeople(peopleOps)
 	if err != nil {
 		fmt.Printf("Error getting People: %s", err.Error())
 	}
@@ -27,10 +27,10 @@ func ExampleConnection_GetPeople() {
 
 func ExampleConnection_GetProjectPeople() {
 	// get project people
-	people_ops = &teamwork.GetPeopleOps{
+	peopleOps = &teamwork.GetPeopleOps{
 		FullProfile: &True,
 	}
-	people, pages, err = conn.GetProjectPeople("158721", people_ops)
+	people, pages, err = conn.GetProjectPeople("158721", peopleOps)
 	if err != nil {
 		fmt.Printf("Error getting Project People: %s", err.Error())
 	}
@@ -45,10 +45,10 @@ func ExampleConnection_GetProjectPeople() {
 
 func ExampleConnection_GetCompanyPeople() {
 	// get company people
-	people_ops = &teamwork.GetPeopleOps{
+	peopleOps = &teamwork.GetPeopleOps{
 		FullProfile: &True,
 	}
-	people, pages, err = conn.GetCompanyPeople(conn.Account.CompanyID, people_ops)
+	people, pages, err = conn.GetCompanyPeople(conn.Account.CompanyID, peopleOps)
 	if err != nil {
 		fmt.Printf("Error getting Company People: %s", err.Error())
 	}

@@ -6,9 +6,10 @@ import (
 	"time"
 )
 
-// A list of People.
+// People is a list of Person(s)
 type People []Person
 
+// Person holds a persons data
 type Person struct {
 	Address struct {
 		City        string `json:"city"`
@@ -146,7 +147,7 @@ type GetPeopleOps struct {
 func (conn *Connection) GetPeople(ops *GetPeopleOps) (People, Pages, error) {
 	people := make(People, 0)
 	pages := &Pages{}
-	params := build_params(ops)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%speople.json%s", conn.Account.Url, params)
 	reader, headers, err := request(conn.ApiToken, method, url, nil)
@@ -155,7 +156,7 @@ func (conn *Connection) GetPeople(ops *GetPeopleOps) (People, Pages, error) {
 	}
 	//data, _ := ioutil.ReadAll(reader)
 	//fmt.Printf(string(data))
-	get_headers(headers, pages)
+	getHeaders(headers, pages)
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
@@ -175,7 +176,7 @@ func (conn *Connection) GetPeople(ops *GetPeopleOps) (People, Pages, error) {
 func (conn *Connection) GetProjectPeople(id string, ops *GetPeopleOps) (People, Pages, error) {
 	people := make(People, 0)
 	pages := &Pages{}
-	params := build_params(ops)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects/%s/people.json%s", conn.Account.Url, id, params)
 	reader, headers, err := request(conn.ApiToken, method, url, nil)
@@ -184,7 +185,7 @@ func (conn *Connection) GetProjectPeople(id string, ops *GetPeopleOps) (People, 
 	}
 	//data, _ := ioutil.ReadAll(reader)
 	//fmt.Printf(string(data))
-	get_headers(headers, pages)
+	getHeaders(headers, pages)
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
@@ -204,7 +205,7 @@ func (conn *Connection) GetProjectPeople(id string, ops *GetPeopleOps) (People, 
 func (conn *Connection) GetCompanyPeople(id string, ops *GetPeopleOps) (People, Pages, error) {
 	people := make(People, 0)
 	pages := &Pages{}
-	params := build_params(ops)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%scompanies/%s/people.json%s", conn.Account.Url, id, params)
 	reader, headers, err := request(conn.ApiToken, method, url, nil)
@@ -213,7 +214,7 @@ func (conn *Connection) GetCompanyPeople(id string, ops *GetPeopleOps) (People, 
 	}
 	//data, _ := ioutil.ReadAll(reader)
 	//fmt.Printf(string(data))
-	get_headers(headers, pages)
+	getHeaders(headers, pages)
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
@@ -251,6 +252,7 @@ func (conn *Connection) GetPerson(id string) (Person, error) {
 	return *person, nil
 }
 
+// GetCurrentPerson gets the current person
 func (conn *Connection) GetCurrentPerson() (Person, error) {
 	person := &Person{}
 	method := "GET"

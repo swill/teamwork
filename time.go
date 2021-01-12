@@ -7,9 +7,10 @@ import (
 	"time"
 )
 
-// A list of Time Entries.
+// TimeEntries is a list of TimeEntry
 type TimeEntries []TimeEntry
 
+// TimeEntry is a description of a time entry
 type TimeEntry struct {
 	CanEdit             bool          `json:"canEdit"`
 	CompanyID           string        `json:"company-id"`
@@ -127,28 +128,28 @@ type DeleteTimeEntryResponse struct {
 //
 // ref: http://developer.teamwork.com/timetracking#retrieve_all_time
 func (conn *Connection) GetTimeEntries(ops *GetTimeEntriesOps) (TimeEntries, Pages, error) {
-	time_entries := make(TimeEntries, 0)
+	timeEntries := make(TimeEntries, 0)
 	pages := &Pages{}
-	params := build_params(ops)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%stime_entries.json%s", conn.Account.Url, params)
 	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
-		return time_entries, *pages, err
+		return timeEntries, *pages, err
 	}
 	// data, _ := ioutil.ReadAll(reader)
 	// fmt.Printf(string(data))
-	get_headers(headers, pages)
+	getHeaders(headers, pages)
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
 		*TimeEntries `json:"time-entries"`
-	}{&time_entries})
+	}{&timeEntries})
 	if err != nil {
-		return time_entries, *pages, err
+		return timeEntries, *pages, err
 	}
 
-	return time_entries, *pages, nil
+	return timeEntries, *pages, nil
 }
 
 // GetProjectTimeEntries gets all the time entries available for a specific project
@@ -156,28 +157,28 @@ func (conn *Connection) GetTimeEntries(ops *GetTimeEntriesOps) (TimeEntries, Pag
 //
 // ref: http://developer.teamwork.com/timetracking#retrieve_all_time
 func (conn *Connection) GetProjectTimeEntries(id string, ops *GetTimeEntriesOps) (TimeEntries, Pages, error) {
-	time_entries := make(TimeEntries, 0)
+	timeEntries := make(TimeEntries, 0)
 	pages := &Pages{}
-	params := build_params(ops)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects/%s/time_entries.json%s", conn.Account.Url, id, params)
 	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
-		return time_entries, *pages, err
+		return timeEntries, *pages, err
 	}
 	//data, _ := ioutil.ReadAll(reader)
 	//fmt.Printf(string(data))
-	get_headers(headers, pages)
+	getHeaders(headers, pages)
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
 		*TimeEntries `json:"time-entries"`
-	}{&time_entries})
+	}{&timeEntries})
 	if err != nil {
-		return time_entries, *pages, err
+		return timeEntries, *pages, err
 	}
 
-	return time_entries, *pages, nil
+	return timeEntries, *pages, nil
 }
 
 // CreateTimeEntryForProject creates a time entry for a project
@@ -198,7 +199,7 @@ func (conn *Connection) CreateTimeEntryForProject(projectID string, ops *CreateT
 	}
 	// data, _ := ioutil.ReadAll(reader)
 	// fmt.Printf(string(data))
-	// get_headers(headers, pages)
+	// getHeaders(headers, pages)
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
@@ -229,7 +230,7 @@ func (conn *Connection) CreateTimeEntryForTask(taskID string, ops *CreateTimeEnt
 	}
 	// data, _ := ioutil.ReadAll(reader)
 	// fmt.Printf(string(data))
-	// get_headers(headers, pages)
+	// getHeaders(headers, pages)
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&createResponse)
@@ -252,7 +253,7 @@ func (conn *Connection) DeleteTimeEntry(id string) (*DeleteTimeEntryResponse, er
 	}
 	// data, _ := ioutil.ReadAll(reader)
 	// fmt.Printf(string(data))
-	// get_headers(headers, pages)
+	// getHeaders(headers, pages)
 	defer reader.Close()
 
 	deleteResponse := &DeleteTimeEntryResponse{}
@@ -271,31 +272,31 @@ func (conn *Connection) DeleteTimeEntry(id string) (*DeleteTimeEntryResponse, er
 //
 // ref: http://developer.teamwork.com/timetracking#retrieve_all_time
 func (conn *Connection) GetTaskTimeEntries(id string, ops *GetTimeEntriesOps) (TimeEntries, Pages, error) {
-	time_entries := make(TimeEntries, 0)
+	timeEntries := make(TimeEntries, 0)
 	pages := &Pages{}
-	params := build_params(ops)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%stasks/%s/time_entries.json%s", conn.Account.Url, id, params)
 	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
-		return time_entries, *pages, err
+		return timeEntries, *pages, err
 	}
 	//data, _ := ioutil.ReadAll(reader)
 	//fmt.Printf(string(data))
-	get_headers(headers, pages)
+	getHeaders(headers, pages)
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
 		*TimeEntries `json:"time-entries"`
-	}{&time_entries})
+	}{&timeEntries})
 	if err != nil {
-		return time_entries, *pages, err
+		return timeEntries, *pages, err
 	}
 
-	return time_entries, *pages, nil
+	return timeEntries, *pages, nil
 }
 
-// Total Time over whole account.
+// TotalTime over whole account.
 type TotalTime struct {
 	BillableHoursSum    string `json:"billable-hours-sum"`
 	BillableMinsSum     string `json:"billable-mins-sum"`
@@ -309,8 +310,10 @@ type TotalTime struct {
 	TotalMinsSum        string `json:"total-mins-sum"`
 }
 
+// ProjectTotalTimes is a list of ProjectTotalTime
 type ProjectTotalTimes []ProjectTotalTime
 
+// ProjectTotalTime describes the time spent on a project
 type ProjectTotalTime struct {
 	Company struct {
 		Name string `json:"name"`
@@ -346,8 +349,10 @@ type ProjectTotalTime struct {
 	} `json:"time-totals"`
 }
 
+// ProjectTaskListTotalTimes is a list of ProjectTaskListTotalTime
 type ProjectTaskListTotalTimes []ProjectTaskListTotalTime
 
+// ProjectTaskListTotalTime is a description of the TaskList total time
 type ProjectTaskListTotalTime struct {
 	Company struct {
 		ID   string `json:"id"`
@@ -387,8 +392,10 @@ type ProjectTaskListTotalTime struct {
 	} `json:"tasklist"`
 }
 
+// ProjectTaskTotalTimes is a list of ProjectTaskTotalTime
 type ProjectTaskTotalTimes []ProjectTaskTotalTime
 
+// ProjectTaskTotalTime is a description of the total time for a Task
 type ProjectTaskTotalTime struct {
 	Company struct {
 		Name string `json:"name"`
@@ -462,13 +469,13 @@ type GetTotalTimeOps struct {
 //
 // ref: http://developer.teamwork.com/timetracking#time_totals
 func (conn *Connection) GetTotalTime(ops *GetTotalTimeOps) (TotalTime, error) {
-	total_time := &TotalTime{}
-	params := build_params(ops)
+	totalTime := &TotalTime{}
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%stime/total.json%s", conn.Account.Url, params)
 	reader, _, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
-		return *total_time, err
+		return *totalTime, err
 	}
 	//data, _ := ioutil.ReadAll(reader)
 	//fmt.Printf(string(data))
@@ -476,12 +483,12 @@ func (conn *Connection) GetTotalTime(ops *GetTotalTimeOps) (TotalTime, error) {
 
 	err = json.NewDecoder(reader).Decode(&struct {
 		*TotalTime `json:"time-totals"`
-	}{total_time})
+	}{totalTime})
 	if err != nil {
-		return *total_time, err
+		return *totalTime, err
 	}
 
-	return *total_time, nil
+	return *totalTime, nil
 }
 
 // GetProjectTotalTime gets total time for a specific project according to the specified
@@ -489,13 +496,13 @@ func (conn *Connection) GetTotalTime(ops *GetTotalTimeOps) (TotalTime, error) {
 //
 // ref: http://developer.teamwork.com/timetracking#time_totals
 func (conn *Connection) GetProjectTotalTime(id string, ops *GetTotalTimeOps) (ProjectTotalTimes, error) {
-	project_total_time := make(ProjectTotalTimes, 0)
-	params := build_params(ops)
+	projectTotalTime := make(ProjectTotalTimes, 0)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects/%s/time/total.json%s", conn.Account.Url, id, params)
 	reader, _, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
-		return project_total_time, err
+		return projectTotalTime, err
 	}
 	//data, _ := ioutil.ReadAll(reader)
 	//fmt.Printf(string(data))
@@ -503,12 +510,12 @@ func (conn *Connection) GetProjectTotalTime(id string, ops *GetTotalTimeOps) (Pr
 
 	err = json.NewDecoder(reader).Decode(&struct {
 		*ProjectTotalTimes `json:"projects"`
-	}{&project_total_time})
+	}{&projectTotalTime})
 	if err != nil {
-		return project_total_time, err
+		return projectTotalTime, err
 	}
 
-	return project_total_time, nil
+	return projectTotalTime, nil
 }
 
 // GetTaskListTotalTime gets total time for a specific task list according to the specified
@@ -516,13 +523,13 @@ func (conn *Connection) GetProjectTotalTime(id string, ops *GetTotalTimeOps) (Pr
 //
 // ref: http://developer.teamwork.com/timetracking#time_totals
 func (conn *Connection) GetTaskListTotalTime(id string, ops *GetTotalTimeOps) (ProjectTaskListTotalTimes, error) {
-	task_list_total_time := make(ProjectTaskListTotalTimes, 0)
-	params := build_params(ops)
+	taskListTotalTime := make(ProjectTaskListTotalTimes, 0)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%stasklists/%s/time/total.json%s", conn.Account.Url, id, params)
 	reader, _, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
-		return task_list_total_time, err
+		return taskListTotalTime, err
 	}
 	//data, _ := ioutil.ReadAll(reader)
 	//fmt.Printf(string(data))
@@ -530,12 +537,12 @@ func (conn *Connection) GetTaskListTotalTime(id string, ops *GetTotalTimeOps) (P
 
 	err = json.NewDecoder(reader).Decode(&struct {
 		*ProjectTaskListTotalTimes `json:"projects"`
-	}{&task_list_total_time})
+	}{&taskListTotalTime})
 	if err != nil {
-		return task_list_total_time, err
+		return taskListTotalTime, err
 	}
 
-	return task_list_total_time, nil
+	return taskListTotalTime, nil
 }
 
 // GetTaskTotalTime gets total time for a specific task according to the specified
@@ -543,13 +550,13 @@ func (conn *Connection) GetTaskListTotalTime(id string, ops *GetTotalTimeOps) (P
 //
 // ref: http://developer.teamwork.com/timetracking#time_totals
 func (conn *Connection) GetTaskTotalTime(id string, ops *GetTotalTimeOps) (ProjectTaskTotalTimes, error) {
-	task_total_time := make(ProjectTaskTotalTimes, 0)
-	params := build_params(ops)
+	taskTotalTime := make(ProjectTaskTotalTimes, 0)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%stasks/%s/time/total.json%s", conn.Account.Url, id, params)
 	reader, _, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
-		return task_total_time, err
+		return taskTotalTime, err
 	}
 	//data, _ := ioutil.ReadAll(reader)
 	//fmt.Printf(string(data))
@@ -557,10 +564,10 @@ func (conn *Connection) GetTaskTotalTime(id string, ops *GetTotalTimeOps) (Proje
 
 	err = json.NewDecoder(reader).Decode(&struct {
 		*ProjectTaskTotalTimes `json:"projects"`
-	}{&task_total_time})
+	}{&taskTotalTime})
 	if err != nil {
-		return task_total_time, err
+		return taskTotalTime, err
 	}
 
-	return task_total_time, nil
+	return taskTotalTime, nil
 }

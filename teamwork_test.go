@@ -9,8 +9,8 @@ import (
 
 func ExampleConnect() {
 	// setup the teamwork connection
-	api_token := "a_teamwork_api_token"
-	conn, err := teamwork.Connect(api_token)
+	apiToken := "a_teamwork_apiToken"
+	conn, err := teamwork.Connect(apiToken)
 	if err != nil {
 		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
 		os.Exit(1)

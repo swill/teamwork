@@ -8,10 +8,10 @@ import (
 
 func ExampleConnection_GetProjects() {
 	// get all projects
-	projects_ops := &teamwork.GetProjectsOps{
+	projectsOps := &teamwork.GetProjectsOps{
 		Status: "ALL",
 	}
-	projects, pages, err := conn.GetProjects(projects_ops)
+	projects, pages, err := conn.GetProjects(projectsOps)
 	if err != nil {
 		fmt.Printf("Error getting Projects: %s", err.Error())
 	}
@@ -27,10 +27,10 @@ func ExampleConnection_GetProjects() {
 func ExampleConnection_GetProject() {
 	// get one project
 	True := true
-	project_ops := &teamwork.GetProjectOps{
+	projectOps := &teamwork.GetProjectOps{
 		IncludePeople: &True,
 	}
-	project, err := conn.GetProject("158747", project_ops)
+	project, err := conn.GetProject("158747", projectOps)
 	if err != nil {
 		fmt.Printf("Error getting Projects: %s", err.Error())
 	}

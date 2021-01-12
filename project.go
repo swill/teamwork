@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// A list of Projects.
+// Projects is a list of Project
 type Projects []Project
 
 // The Project structure.
@@ -106,14 +106,14 @@ type GetProjectsOps struct {
 func (conn *Connection) GetProjects(ops *GetProjectsOps) (Projects, Pages, error) {
 	projects := make(Projects, 0)
 	pages := &Pages{}
-	params := build_params(ops)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects.json%s", conn.Account.Url, params)
 	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
 		return projects, *pages, err
 	}
-	get_headers(headers, pages)
+	getHeaders(headers, pages)
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
@@ -141,7 +141,7 @@ type GetProjectOps struct {
 // ref: http://developer.teamwork.com/projectsapi#retrieve_a_single
 func (conn *Connection) GetProject(id string, ops *GetProjectOps) (Project, error) {
 	project := &Project{}
-	params := build_params(ops)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects/%s.json%s", conn.Account.Url, id, params)
 	reader, _, err := request(conn.ApiToken, method, url, nil)

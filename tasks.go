@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// A list of Tasks.
+// Tasks is a list of Task
 type Tasks []Task
 
 // The Task structure.
@@ -185,7 +185,7 @@ type GetTasksOps struct {
 func (conn *Connection) GetTasks(ops *GetTasksOps) (Tasks, Pages, error) {
 	tasks := make(Tasks, 0)
 	pages := &Pages{}
-	params := build_params(ops)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%stasks.json%s", conn.Account.Url, params)
 	reader, headers, err := request(conn.ApiToken, method, url, nil)
@@ -194,7 +194,7 @@ func (conn *Connection) GetTasks(ops *GetTasksOps) (Tasks, Pages, error) {
 	}
 	//data, _ := ioutil.ReadAll(reader)
 	//fmt.Printf(string(data))
-	get_headers(headers, pages)
+	getHeaders(headers, pages)
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
@@ -214,7 +214,7 @@ func (conn *Connection) GetTasks(ops *GetTasksOps) (Tasks, Pages, error) {
 func (conn *Connection) GetProjectTasks(id string, ops *GetTasksOps) (Tasks, Pages, error) {
 	tasks := make(Tasks, 0)
 	pages := &Pages{}
-	params := build_params(ops)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects/%s/tasks.json%s", conn.Account.Url, id, params)
 	reader, headers, err := request(conn.ApiToken, method, url, nil)
@@ -223,7 +223,7 @@ func (conn *Connection) GetProjectTasks(id string, ops *GetTasksOps) (Tasks, Pag
 	}
 	// data, _ := ioutil.ReadAll(reader)
 	// fmt.Printf(string(data))
-	get_headers(headers, pages)
+	getHeaders(headers, pages)
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
@@ -243,7 +243,7 @@ func (conn *Connection) GetProjectTasks(id string, ops *GetTasksOps) (Tasks, Pag
 func (conn *Connection) GetTaskListTasks(id string, ops *GetTasksOps) (Tasks, Pages, error) {
 	tasks := make(Tasks, 0)
 	pages := &Pages{}
-	params := build_params(ops)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%stasklists/%s/tasks.json%s", conn.Account.Url, id, params)
 	reader, headers, err := request(conn.ApiToken, method, url, nil)
@@ -252,7 +252,7 @@ func (conn *Connection) GetTaskListTasks(id string, ops *GetTasksOps) (Tasks, Pa
 	}
 	//data, _ := ioutil.ReadAll(reader)
 	//fmt.Printf(string(data))
-	get_headers(headers, pages)
+	getHeaders(headers, pages)
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
@@ -265,7 +265,7 @@ func (conn *Connection) GetTaskListTasks(id string, ops *GetTasksOps) (Tasks, Pa
 	return tasks, *pages, nil
 }
 
-// A list of TaskLists.
+// TaskLists is a list of TaskList
 type TaskLists []TaskList
 
 // The TaskList structure.
@@ -316,26 +316,26 @@ type GetProjectTaskListsOps struct {
 //
 // ref: http://developer.teamwork.com/tasklists#get_all_task_list
 func (conn *Connection) GetProjectTaskLists(id string, ops *GetProjectTaskListsOps) (TaskLists, Pages, error) {
-	task_lists := make(TaskLists, 0)
+	taskLists := make(TaskLists, 0)
 	pages := &Pages{}
-	params := build_params(ops)
+	params := buildParams(ops)
 	method := "GET"
 	url := fmt.Sprintf("%sprojects/%s/tasklists.json%s", conn.Account.Url, id, params)
 	reader, headers, err := request(conn.ApiToken, method, url, nil)
 	if err != nil {
-		return task_lists, *pages, err
+		return taskLists, *pages, err
 	}
 	//data, _ := ioutil.ReadAll(reader)
 	//fmt.Printf(string(data))
-	get_headers(headers, pages)
+	getHeaders(headers, pages)
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
 		*TaskLists `json:"tasklists"`
-	}{&task_lists})
+	}{&taskLists})
 	if err != nil {
-		return task_lists, *pages, err
+		return taskLists, *pages, err
 	}
 
-	return task_lists, *pages, nil
+	return taskLists, *pages, nil
 }

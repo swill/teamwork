@@ -56,22 +56,22 @@ type Connection struct {
 // Connect is the starting point to using the TeamWork API.
 // This function returns a Connection which is used to query
 // TeamWork via other functions.
-func Connect(baseUrl string, ApiToken string) (*Connection, error) {
+func Connect(baseURL string, APIToken string) (*Connection, error) {
 	method := "GET"
 
-	u, err := url.Parse(baseUrl)
+	u, err := url.Parse(baseURL)
 	u.Path = path.Join(u.Path, "authenticate.json")
 	url := u.String()
 	// log.Println(url)
 
-	reader, _, err := request(ApiToken, method, url, nil)
+	reader, _, err := request(APIToken, method, url, nil)
 	if err != nil {
 		return nil, err
 	}
 	defer reader.Close()
 
 	connection := &Connection{
-		ApiToken: ApiToken,
+		ApiToken: APIToken,
 	}
 	if err := json.NewDecoder(reader).Decode(connection); err != nil {
 		return nil, err
@@ -114,86 +114,86 @@ func request(token, method, url string, body io.Reader) (io.ReadCloser, http.Hea
 	return resp.Body, resp.Header, nil
 }
 
-// build_params takes a struct and builds query params based
-// on the `param:"param_name"` struct field tags.
+// buildParams takes a struct and builds query params based
+// on the `param:"paramName"` struct field tags.
 //
 // ref: https://play.golang.org/p/P9zvVJnMhR
 // ref: https://gist.github.com/drewolson/4771479
-func build_params(ops interface{}) string {
+func buildParams(ops interface{}) string {
 	pairs := make([]string, 0)
 	v := reflect.ValueOf(ops).Elem()
 	for i := 0; i < v.NumField(); i++ {
-		var param_value string
-		param_name := v.Type().Field(i).Tag.Get("param") // get value from struct field tag
+		var paramValue string
+		paramName := v.Type().Field(i).Tag.Get("param") // get value from struct field tag
 
-		is_pointer := false
+		isPointer := false
 		var kind reflect.Kind
 		// Handle variable types
 		switch {
 		case v.Field(i).Kind() == reflect.Ptr:
 			kind = v.Field(i).Elem().Kind()
-			is_pointer = true
+			isPointer = true
 		case v.Field(i).Kind() == reflect.String:
-			param_value = v.Field(i).Interface().(string)
+			paramValue = v.Field(i).Interface().(string)
 		case v.Field(i).Kind() == reflect.Bool:
-			param_value = strconv.FormatBool(v.Field(i).Interface().(bool))
+			paramValue = strconv.FormatBool(v.Field(i).Interface().(bool))
 		case v.Field(i).Kind() == reflect.Int:
-			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int)), 10)
+			paramValue = strconv.FormatInt(int64(v.Field(i).Interface().(int)), 10)
 		case v.Field(i).Kind() == reflect.Int8:
-			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int8)), 10)
+			paramValue = strconv.FormatInt(int64(v.Field(i).Interface().(int8)), 10)
 		case v.Field(i).Kind() == reflect.Int16:
-			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int16)), 10)
+			paramValue = strconv.FormatInt(int64(v.Field(i).Interface().(int16)), 10)
 		case v.Field(i).Kind() == reflect.Int32:
-			param_value = strconv.FormatInt(int64(v.Field(i).Interface().(int32)), 10)
+			paramValue = strconv.FormatInt(int64(v.Field(i).Interface().(int32)), 10)
 		case v.Field(i).Kind() == reflect.Int64:
-			param_value = strconv.FormatInt(v.Field(i).Interface().(int64), 10)
+			paramValue = strconv.FormatInt(v.Field(i).Interface().(int64), 10)
 		case v.Field(i).Kind() == reflect.Float32:
-			param_value = strconv.FormatFloat(float64(v.Field(i).Interface().(float32)), 'f', -1, 64)
+			paramValue = strconv.FormatFloat(float64(v.Field(i).Interface().(float32)), 'f', -1, 64)
 		case v.Field(i).Kind() == reflect.Float64:
-			param_value = strconv.FormatFloat(v.Field(i).Interface().(float64), 'f', -1, 64)
+			paramValue = strconv.FormatFloat(v.Field(i).Interface().(float64), 'f', -1, 64)
 		}
 
 		// handle pointers
 		switch {
-		case is_pointer && kind == reflect.String:
+		case isPointer && kind == reflect.String:
 			if v.Field(i).Interface() != nil {
-				param_value = *v.Field(i).Interface().(*string)
+				paramValue = *v.Field(i).Interface().(*string)
 			}
-		case is_pointer && kind == reflect.Bool:
+		case isPointer && kind == reflect.Bool:
 			if v.Field(i).Interface() != nil {
-				param_value = strconv.FormatBool(*v.Field(i).Interface().(*bool))
+				paramValue = strconv.FormatBool(*v.Field(i).Interface().(*bool))
 			}
-		case is_pointer && kind == reflect.Int:
+		case isPointer && kind == reflect.Int:
 			if v.Field(i).Interface() != nil {
-				param_value = strconv.FormatInt(int64(*v.Field(i).Interface().(*int)), 10)
+				paramValue = strconv.FormatInt(int64(*v.Field(i).Interface().(*int)), 10)
 			}
-		case is_pointer && kind == reflect.Int8:
+		case isPointer && kind == reflect.Int8:
 			if v.Field(i).Interface() != nil {
-				param_value = strconv.FormatInt(int64(*v.Field(i).Interface().(*int8)), 10)
+				paramValue = strconv.FormatInt(int64(*v.Field(i).Interface().(*int8)), 10)
 			}
-		case is_pointer && kind == reflect.Int16:
+		case isPointer && kind == reflect.Int16:
 			if v.Field(i).Interface() != nil {
-				param_value = strconv.FormatInt(int64(*v.Field(i).Interface().(*int16)), 10)
+				paramValue = strconv.FormatInt(int64(*v.Field(i).Interface().(*int16)), 10)
 			}
-		case is_pointer && kind == reflect.Int32:
+		case isPointer && kind == reflect.Int32:
 			if v.Field(i).Interface() != nil {
-				param_value = strconv.FormatInt(int64(*v.Field(i).Interface().(*int32)), 10)
+				paramValue = strconv.FormatInt(int64(*v.Field(i).Interface().(*int32)), 10)
 			}
-		case is_pointer && kind == reflect.Int64:
+		case isPointer && kind == reflect.Int64:
 			if v.Field(i).Interface() != nil {
-				param_value = strconv.FormatInt(*v.Field(i).Interface().(*int64), 10)
+				paramValue = strconv.FormatInt(*v.Field(i).Interface().(*int64), 10)
 			}
-		case is_pointer && kind == reflect.Float32:
+		case isPointer && kind == reflect.Float32:
 			if v.Field(i).Interface() != nil {
-				param_value = strconv.FormatFloat(float64(*v.Field(i).Interface().(*float32)), 'f', -1, 64)
+				paramValue = strconv.FormatFloat(float64(*v.Field(i).Interface().(*float32)), 'f', -1, 64)
 			}
-		case is_pointer && kind == reflect.Float64:
+		case isPointer && kind == reflect.Float64:
 			if v.Field(i).Interface() != nil {
-				param_value = strconv.FormatFloat(*v.Field(i).Interface().(*float64), 'f', -1, 64)
+				paramValue = strconv.FormatFloat(*v.Field(i).Interface().(*float64), 'f', -1, 64)
 			}
 		}
-		if param_name != "" && param_value != "" { // make sure we have what we need to set a param
-			pair := fmt.Sprintf("%s=%s", param_name, param_value)
+		if paramName != "" && paramValue != "" { // make sure we have what we need to set a param
+			pair := fmt.Sprintf("%s=%s", paramName, paramValue)
 			pairs = append(pairs, pair) // add to the param pairs array
 		}
 	}
@@ -204,35 +204,35 @@ func build_params(ops interface{}) string {
 	}
 }
 
-// get_headers takes the response headers and populates
+// getHeaders takes the response headers and populates
 // a struct of data according to the `header:"HeaderName"`.
 // Function currently only supports Int and String field types.
 //
 // ref: https://play.golang.org/p/P9zvVJnMhR
 // ref: https://gist.github.com/drewolson/4771479
 // ref: http://stackoverflow.com/a/6396678/977216
-func get_headers(headers http.Header, obj interface{}) {
+func getHeaders(headers http.Header, obj interface{}) {
 	v := reflect.ValueOf(obj).Elem()
 	if v.Kind() == reflect.Struct { // make sure we have a struct
 		for i := 0; i < v.NumField(); i++ { // for all fields
 			field := v.Field(i)                    // value field.
 			if field.IsValid() && field.CanSet() { // is exported and addressable
-				header_name := v.Type().Field(i).Tag.Get("header") // get value from struct field tag
-				if header_name != "" {                             // make sure the header is set
-					header_val := headers.Get(header_name)
-					if header_val != "" { // make sure we have a value in the header
+				headerName := v.Type().Field(i).Tag.Get("header") // get value from struct field tag
+				if headerName != "" {                             // make sure the header is set
+					headerVal := headers.Get(headerName)
+					if headerVal != "" { // make sure we have a value in the header
 						switch {
 						case field.Kind() == reflect.Int: // Int struct field type
-							h_val, err := strconv.ParseInt(header_val, 10, 64)
+							hVal, err := strconv.ParseInt(headerVal, 10, 64)
 							if err != nil {
-								log.Printf("Failed to convert header '%s' to a 64 bit Int. \n%s", header_name, err.Error())
+								log.Printf("Failed to convert header '%s' to a 64 bit Int. \n%s", headerName, err.Error())
 								continue
 							}
-							if !field.OverflowInt(h_val) {
-								field.SetInt(h_val)
+							if !field.OverflowInt(hVal) {
+								field.SetInt(hVal)
 							}
 						case field.Kind() == reflect.String: // String struct field type
-							field.SetString(header_val)
+							field.SetString(headerVal)
 						}
 					}
 				}
