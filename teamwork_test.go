@@ -16,4 +16,5 @@ func ExampleConnect() {
 		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
 		os.Exit(1)
 	}
+	fmt.Printf("%+v", conn) // this is just so the go linter doesn't complain about "conn defined and not used"
 }

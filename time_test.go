@@ -2,11 +2,21 @@ package teamwork_test
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/swill/teamwork"
 )
 
 func ExampleConnection_GetTimeEntries() {
+	// setup the teamwork connection
+	baseURL := "a teamwork baseURL"
+	apiToken := "a_teamwork_apiToken"
+	conn, err := teamwork.Connect(baseURL, apiToken)
+	if err != nil {
+		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// get all time entries
 	Page := 200
 	timeEntriesOps := &teamwork.GetTimeEntriesOps{
@@ -26,6 +36,15 @@ func ExampleConnection_GetTimeEntries() {
 }
 
 func ExampleConnection_GetProjectTimeEntries() {
+	// setup the teamwork connection
+	baseURL := "a teamwork baseURL"
+	apiToken := "a_teamwork_apiToken"
+	conn, err := teamwork.Connect(baseURL, apiToken)
+	if err != nil {
+		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// get all project time entries
 	projectTimeEntriesOps := &teamwork.GetTimeEntriesOps{}
 	projectTimeEntries, pages, err := conn.GetProjectTimeEntries("158721", projectTimeEntriesOps)
@@ -43,6 +62,15 @@ func ExampleConnection_GetProjectTimeEntries() {
 }
 
 func ExampleConnection_GetTaskTimeEntries() {
+	// setup the teamwork connection
+	baseURL := "a teamwork baseURL"
+	apiToken := "a_teamwork_apiToken"
+	conn, err := teamwork.Connect(baseURL, apiToken)
+	if err != nil {
+		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// get all task time entries
 	taskTimeEntriesOps := &teamwork.GetTimeEntriesOps{}
 	taskTimeEntries, pages, err := conn.GetTaskTimeEntries("4754100", taskTimeEntriesOps)
@@ -51,8 +79,8 @@ func ExampleConnection_GetTaskTimeEntries() {
 	}
 
 	fmt.Println("GetTaskTimeEntries")
-	fmt.Println("1. Time for Task List:", taskTimeEntries[0].ToDoListName)
-	fmt.Println("1. Time for Task Name:", taskTimeEntries[0].ToDoItemName)
+	fmt.Println("1. Time for Task List:", taskTimeEntries[0].TaskListName)
+	fmt.Println("1. Time for Task Name:", taskTimeEntries[0].TaskItemName)
 	fmt.Println("1. Time for Date:", taskTimeEntries[0].Date)
 	fmt.Println("1. Time in Hours:", taskTimeEntries[0].Hours)
 	fmt.Println("on page #:", pages.Page)
@@ -61,6 +89,15 @@ func ExampleConnection_GetTaskTimeEntries() {
 }
 
 func ExampleConnection_GetTotalTime() {
+	// setup the teamwork connection
+	baseURL := "a teamwork baseURL"
+	apiToken := "a_teamwork_apiToken"
+	conn, err := teamwork.Connect(baseURL, apiToken)
+	if err != nil {
+		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// get total time for an account
 	totalTimeOps := &teamwork.GetTotalTimeOps{}
 	totalTime, err := conn.GetTotalTime(totalTimeOps)
@@ -74,8 +111,17 @@ func ExampleConnection_GetTotalTime() {
 }
 
 func ExampleConnection_GetProjectTotalTime() {
+	// setup the teamwork connection
+	baseURL := "a teamwork baseURL"
+	apiToken := "a_teamwork_apiToken"
+	conn, err := teamwork.Connect(baseURL, apiToken)
+	if err != nil {
+		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// get total time for a project
-	totalTimeOps = &teamwork.GetTotalTimeOps{}
+	totalTimeOps := &teamwork.GetTotalTimeOps{}
 	projectTotalTime, err := conn.GetProjectTotalTime("158721", totalTimeOps)
 	if err != nil {
 		fmt.Printf("Error getting Project Total Time: %s", err.Error())
@@ -88,8 +134,17 @@ func ExampleConnection_GetProjectTotalTime() {
 }
 
 func ExampleConnection_GetTaskListTotalTime() {
+	// setup the teamwork connection
+	baseURL := "a teamwork baseURL"
+	apiToken := "a_teamwork_apiToken"
+	conn, err := teamwork.Connect(baseURL, apiToken)
+	if err != nil {
+		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// get total time for a task list
-	totalTimeOps = &teamwork.GetTotalTimeOps{}
+	totalTimeOps := &teamwork.GetTotalTimeOps{}
 	taskListTotalTime, err := conn.GetTaskListTotalTime("704748", totalTimeOps)
 	if err != nil {
 		fmt.Printf("Error getting Project Total Time: %s", err.Error())
@@ -102,8 +157,17 @@ func ExampleConnection_GetTaskListTotalTime() {
 }
 
 func ExampleConnection_GetTaskTotalTime() {
+	// setup the teamwork connection
+	baseURL := "a teamwork baseURL"
+	apiToken := "a_teamwork_apiToken"
+	conn, err := teamwork.Connect(baseURL, apiToken)
+	if err != nil {
+		fmt.Printf("Error connecting to TeamWork: %s", err.Error())
+		os.Exit(1)
+	}
+
 	// get total time for a task
-	totalTimeOps = &teamwork.GetTotalTimeOps{}
+	totalTimeOps := &teamwork.GetTotalTimeOps{}
 	taskTotalTime, err := conn.GetTaskTotalTime("4486838", totalTimeOps)
 	if err != nil {
 		fmt.Printf("Error getting Project Total Time: %s", err.Error())
