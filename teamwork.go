@@ -89,7 +89,11 @@ func request(token, method, url string, body io.Reader) (io.ReadCloser, http.Hea
 	}
 	req.Header.Set("Accept", "application/json")
 	req.Header.Set("Content-Type", "application/json")
-	req.SetBasicAuth(token, "notused")
+	if strings.HasPrefix(token, "tkn.v1") {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+	} else {
+		req.SetBasicAuth(token, "notused")
+	}
 
 	// // Save a copy of this request for debugging.
 	// req_dump, err := httputil.DumpRequest(req, true)
