@@ -78,7 +78,6 @@ type Task struct {
 	TaskListID                int           `json:"todo-list-id"`
 	TaskListIsTemplate        bool          `json:"tasklist-isTemplate"`
 	TaskListLockdownID        string        `json:"tasklist-lockdownId"`
-	TaskListName              string        `json:"todo-list-name"`
 	TaskListPrivate           bool          `json:"tasklist-private"`
 	Tags                      []struct {
 		Color string `json:"color"`
@@ -105,6 +104,11 @@ type GetTasksOps struct {
 	// For requesting tasks made by a specific person or people.
 	// Format is a comma separated list of Person IDs.
 	CreatorIDs string `param:"creator-ids"`
+	// Tasks can be sorted by the following options:
+	//   "duedate", "duedateDESC", "startdate", "dateadded", "priority", "project", "manual", "duestartdate",
+	//   "duestartdatedesc", "alldates", "alldatesdesc", "completedDateDESC", "flattenedtasklist",
+	//   "company", "dateupdated"
+	DateUpdatedASC string `param:"dateupdatedASC"`
 	// Must be used in conjunction with StartDate.
 	// Format: "YYYYMMDD"
 	EndDate string `param:"enddate"`
@@ -129,6 +133,8 @@ type GetTasksOps struct {
 	// Extra tasks that can be included with the filter option.
 	// Valid Input: "nodate", "nostartdate", "noduedate", "overdue"
 	Include string `param:"include"`
+	// Include archived projects in the response
+	IncludeArchivedProjects *bool `param:"includeArchivedProjects"`
 	// Sub-tasks that have been marked as completed can be shown by setting this parameter to true
 	// if you have requested to include sub-tasks
 	// Valid Input: true, false
@@ -138,6 +144,11 @@ type GetTasksOps struct {
 	// Valid Input: true, false
 	// Default: false
 	IncludeCompletedTasks *bool `param:"includeCompletedTasks"`
+	// Allows you to get back tasks with no due date if set to false.
+	// Default: true
+	IncludeTasksWithoutDueDates *bool `param:"includeTasksWithoutDueDates"`
+	// Retrieve tasks from deleted lists
+	IncludeTasksFromDeletedLists *bool `param:"includeTasksFromDeletedLists"`
 	// When using the filter option with any of the following options; within7,within14,within30,within365.
 	// You can choose to exclude deadlines for today by passing this parameter as false.
 	// Valid Input: true, false
@@ -154,6 +165,9 @@ type GetTasksOps struct {
 	// Normally used in conjunction with the Page parameter.
 	// Default: 250
 	PageSize *int `param:"pageSize"`
+	// A comma separated list of Project IDs to get tasks for.
+	// ONLY relevant for the 'GetTasks' function, and not 'GetProjectTasks'.
+	ProjectIDs string `param:"projectIds"`
 	// Tasks can be filtered by the person/people a task is assigned to.
 	// Details:
 	// "-1" would return all tasks with an assigned person.
