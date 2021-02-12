@@ -56,7 +56,6 @@ type Task struct {
 	LastChangedOn             time.Time     `json:"last-changed-on"`
 	LockdownID                string        `json:"lockdownId"`
 	Order                     int           `json:"order"`
-	Name                      string        `json:"todo-list-name"`
 	ParentTaskID              string        `json:"parentTaskId"`
 	Position                  int           `json:"position"`
 	Predecessors              []interface{} `json:"predecessors"`
@@ -76,6 +75,7 @@ type Task struct {
 	Status                    string        `json:"status"`
 	SubTasks                  []Task        `json:"subTasks,omitempty"`
 	TaskListID                int           `json:"todo-list-id"`
+	TaskListName              string        `json:"todo-list-name"`
 	TaskListIsTemplate        bool          `json:"tasklist-isTemplate"`
 	TaskListLockdownID        string        `json:"tasklist-lockdownId"`
 	TaskListPrivate           bool          `json:"tasklist-private"`
