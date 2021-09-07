@@ -138,6 +138,11 @@ type GetPeopleOps struct {
 	// Pass this parameter to return the ProjectIds the user is a member of.
 	// Valid Input: true, false
 	ReturnProjectIds *bool `param:"returnProjectIds"`
+	// A page of results.  Access additional pages.  (eg: 2, etc...)
+	Page *int `param:"page"`
+	// The amount of tasks returned can be limited using this parameter.
+	// Normally used in conjunction with the Page parameter.
+	PageSize *int `param:"pageSize"`
 }
 
 // GetPeople gets all the people available according to the specified
