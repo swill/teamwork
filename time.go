@@ -114,7 +114,7 @@ type CreateTimeEntryOps struct {
 
 // CreateTimeEntryResponse captures the response returned from a create time entry action
 type CreateTimeEntryResponse struct {
-	ID     string `json:"timeLogId"`
+	ID     int    `json:"timeLogId"`
 	Status string `json:"STATUS"`
 }
 
