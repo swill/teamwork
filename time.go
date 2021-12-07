@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"time"
 )
 
@@ -114,6 +115,12 @@ type CreateTimeEntryOps struct {
 
 // CreateTimeEntryResponse captures the response returned from a create time entry action
 type CreateTimeEntryResponse struct {
+	ID     string `json:"timeLogId"`
+	Status string `json:"STATUS"`
+}
+
+// CreateTimeEntryResponseHack captures the response from the API, but can't be used due to the broken api types
+type CreateTimeEntryResponseHack struct {
 	ID     int    `json:"timeLogId"`
 	Status string `json:"STATUS"`
 }
@@ -190,7 +197,7 @@ func (conn *Connection) CreateTimeEntryForProject(projectID string, ops *CreateT
 		TimeEntry *CreateTimeEntryOps `json:"time-entry"`
 	}{TimeEntry: ops})
 	// fmt.Println(string(jsonBody))
-	createResponse := &CreateTimeEntryResponse{}
+	createResponseHack := &CreateTimeEntryResponseHack{}
 	method := "POST"
 	url := fmt.Sprintf("%sprojects/%s/time_entries.json", conn.Account.Url, projectID)
 	reader, _, err := request(conn.ApiToken, method, url, bytes.NewBuffer(jsonBody))
@@ -203,11 +210,15 @@ func (conn *Connection) CreateTimeEntryForProject(projectID string, ops *CreateT
 	defer reader.Close()
 
 	err = json.NewDecoder(reader).Decode(&struct {
-		*CreateTimeEntryResponse `json:"time-entry"`
-	}{createResponse})
+		*CreateTimeEntryResponseHack `json:"time-entry"`
+	}{createResponseHack})
 	if err != nil {
 		return nil, err
 	}
+
+	createResponse := &CreateTimeEntryResponse{}
+	createResponse.ID = strconv.Itoa(createResponseHack.ID)
+	createResponse.Status = createResponseHack.Status
 
 	return createResponse, nil
 }
@@ -221,7 +232,7 @@ func (conn *Connection) CreateTimeEntryForTask(taskID string, ops *CreateTimeEnt
 		TimeEntry *CreateTimeEntryOps `json:"time-entry"`
 	}{TimeEntry: ops})
 	// fmt.Println(string(jsonBody))
-	createResponse := &CreateTimeEntryResponse{}
+	createResponseHack := &CreateTimeEntryResponseHack{}
 	method := "POST"
 	url := fmt.Sprintf("%stasks/%s/time_entries.json", conn.Account.Url, taskID)
 	reader, _, err := request(conn.ApiToken, method, url, bytes.NewBuffer(jsonBody))
@@ -233,10 +244,14 @@ func (conn *Connection) CreateTimeEntryForTask(taskID string, ops *CreateTimeEnt
 	// getHeaders(headers, pages)
 	defer reader.Close()
 
-	err = json.NewDecoder(reader).Decode(&createResponse)
+	err = json.NewDecoder(reader).Decode(&createResponseHack)
 	if err != nil {
 		return nil, err
 	}
+
+	createResponse := &CreateTimeEntryResponse{}
+	createResponse.ID = strconv.Itoa(createResponseHack.ID)
+	createResponse.Status = createResponseHack.Status
 
 	return createResponse, nil
 }
