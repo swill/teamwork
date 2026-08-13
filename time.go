@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"time"
 )
 
@@ -195,6 +196,9 @@ func (conn *Connection) CreateTimeEntryForProject(projectID string, ops *CreateT
 	jsonBody, err := json.Marshal(struct {
 		TimeEntry *CreateTimeEntryOps `json:"time-entry"`
 	}{TimeEntry: ops})
+	if err != nil {
+		return nil, err
+	}
 	// fmt.Println(string(jsonBody))
 	createResponse := &CreateTimeEntryResponse{}
 	method := "POST"
@@ -226,6 +230,9 @@ func (conn *Connection) CreateTimeEntryForTask(taskID string, ops *CreateTimeEnt
 	jsonBody, err := json.Marshal(struct {
 		TimeEntry *CreateTimeEntryOps `json:"time-entry"`
 	}{TimeEntry: ops})
+	if err != nil {
+		return nil, err
+	}
 	// fmt.Println(string(jsonBody))
 	createResponse := &CreateTimeEntryResponse{}
 	method := "POST"
@@ -238,10 +245,14 @@ func (conn *Connection) CreateTimeEntryForTask(taskID string, ops *CreateTimeEnt
 	// fmt.Printf(string(data))
 	// getHeaders(headers, pages)
 	defer reader.Close()
+	var buf bytes.Buffer
+	teeReader := io.TeeReader(reader, &buf)
+	data, _ := io.ReadAll(&buf)
+	// log.Println(string(data))
 
-	err = json.NewDecoder(reader).Decode(&createResponse)
+	err = json.NewDecoder(teeReader).Decode(&createResponse)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error: %s | raw: %s", err, string(data))
 	}
 
 	return createResponse, nil
@@ -261,11 +272,15 @@ func (conn *Connection) DeleteTimeEntry(id string) (*DeleteTimeEntryResponse, er
 	// fmt.Printf(string(data))
 	// getHeaders(headers, pages)
 	defer reader.Close()
+	var buf bytes.Buffer
+	teeReader := io.TeeReader(reader, &buf)
+	data, _ := io.ReadAll(&buf)
+	//log.Println(string(data))
 
 	deleteResponse := &DeleteTimeEntryResponse{}
-	err = json.NewDecoder(reader).Decode(deleteResponse)
+	err = json.NewDecoder(teeReader).Decode(deleteResponse)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error: %s | raw: %s", err, string(data))
 	}
 
 	// fmt.Printf("%+v", deleteResponse)

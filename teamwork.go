@@ -18,13 +18,16 @@ import (
 // which is making the calls to the API.
 type Connection struct {
 	Account struct {
-		AvatarUrl                  string `json:"avatar-url"`
-		CanAddProjects             string `json:"canaddprojects"`
-		CanManagePeople            string `json:"canManagePeople"`
+		AvatarURL                  string `json:"avatar-url"`
+		CanAddProjects             int    `json:"canaddprojects"`
+		CanManagePeople            int    `json:"canManagePeople"`
+		CanManageProjectTemplates  int    `json:"canManageProjectTemplates"`
+		CanViewProjectTemplates    int    `json:"canViewProjectTemplates"`
 		ChatEnabled                bool   `json:"chatEnabled"`
 		Code                       string `json:"code"`
 		CompanyID                  string `json:"companyid"`
 		CompanyName                string `json:"companyname"`
+		CRMEnabled                 bool   `json:"CRMEnabled"`
 		DateFormat                 string `json:"dateFormat"`
 		DateSeperator              string `json:"dateSeperator"`
 		DeskEnabled                bool   `json:"deskEnabled"`
@@ -36,9 +39,14 @@ type Connection struct {
 		LikesEnabled               bool   `json:"likesEnabled"`
 		Logo                       string `json:"logo"`
 		Name                       string `json:"name"`
+		OneDriveBusinessEnabled    bool   `json:"oneDriveBusinessEnabled"`
+		OneDriveEnabled            bool   `json:"oneDriveEnabled"`
 		PlanID                     string `json:"plan-id"`
+		PortfolioEnabled           bool   `json:"portfolioEnabled"`
 		ProjectsEnabled            bool   `json:"projectsEnabled"`
 		RequireHttps               bool   `json:"requirehttps"`
+		SharepointEnabled          bool   `json:"sharepointEnabled"`
+		SpacesEnabled              bool   `json:"spacesEnabled"`
 		SslEnabled                 bool   `json:"ssl-enabled"`
 		StartOnSundays             bool   `json:"startonsundays"`
 		TagsEnabled                bool   `json:"tagsEnabled"`
@@ -60,6 +68,9 @@ func Connect(baseURL string, APIToken string) (*Connection, error) {
 	method := "GET"
 
 	u, err := url.Parse(baseURL)
+	if err != nil {
+		return nil, err
+	}
 	u.Path = path.Join(u.Path, "authenticate.json")
 	url := u.String()
 	// log.Println(url)

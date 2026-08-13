@@ -1,8 +1,10 @@
 package teamwork
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"time"
 )
 
@@ -188,16 +190,19 @@ func (conn *Connection) GetProjectPeople(id string, ops *GetPeopleOps) (People, 
 	if err != nil {
 		return people, *pages, err
 	}
-	//data, _ := ioutil.ReadAll(reader)
-	//fmt.Printf(string(data))
-	getHeaders(headers, pages)
 	defer reader.Close()
+	var buf bytes.Buffer
+	teeReader := io.TeeReader(reader, &buf)
 
-	err = json.NewDecoder(reader).Decode(&struct {
+	data, _ := io.ReadAll(&buf)
+	//log.Println(string(data))
+
+	getHeaders(headers, pages)
+	err = json.NewDecoder(teeReader).Decode(&struct {
 		*People `json:"people"`
 	}{&people})
 	if err != nil {
-		return people, *pages, err
+		return people, *pages, fmt.Errorf("error: %s | raw: %s", err, string(data))
 	}
 
 	return people, *pages, nil
